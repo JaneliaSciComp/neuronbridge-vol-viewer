@@ -1,12 +1,19 @@
-import "./App.css";
 import Navigation from "./Navigation";
+import VolumeViewer from "./VolumeViewer";
+import { Layout } from "antd";
+
+import "./App.css";
+
+const { Content } = Layout;
 
 function App() {
   return (
-    <div>
+    <Layout>
       <Navigation />
-      <p>Neuronbridge-vol-viewer</p>
-    </div>
+      <Content>
+        <VolumeViewer />
+      </Content>
+    </Layout>
   );
 }
 

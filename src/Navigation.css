@@ -1,0 +1,21 @@
+header {
+  position: fixed;
+  z-index: 50;
+  width: 100%;
+  background: #333;
+}
+
+header img {
+  height: 40px;
+}
+
+.janeliaLogo {
+  position: absolute;
+  top: 0;
+  right: 2em;
+}
+
+.janeliaLogo img {
+  margin-top: -7px;
+  margin-left: 1em;
+}
