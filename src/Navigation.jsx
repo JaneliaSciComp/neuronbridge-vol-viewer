@@ -2,8 +2,8 @@ import neuronbridgeLogo from "./neuronbridge_logo.png";
 import janeliaLogo from "./janelia_logo.png";
 import flyemLogo from "./flyemLogo.png";
 import flylightLogo from "./flylightlogo.png";
-import { Link } from "react-router-dom";
-import { Layout } from "antd";
+import { Layout, Menu } from "antd";
+import RefLink from "./RefLink";
 
 import "./Navigation.css";
 
@@ -14,9 +14,19 @@ const { Header } = Layout;
 export default function Navigation() {
   return (
     <Header>
-      <Link to="/">
-        <img src={neuronbridgeLogo} alt="NeuronBridge" />
-      </Link>
+      <Menu
+        className="nav-menu"
+        theme="dark"
+        mode="horizontal"
+        style={{ lineHeight: "64px" }}
+      >
+        <Menu.Item key="logo" className="logo">
+          <a href="https://neuronbridge.janelia.org">
+            <img src={neuronbridgeLogo} alt="NeuronBridge" />
+          </a>
+        </Menu.Item>
+        <RefLink />
+      </Menu>
       <div className="janeliaLogo">
         <a
           className="projectLogo"
