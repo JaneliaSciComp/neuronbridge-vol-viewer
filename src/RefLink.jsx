@@ -6,8 +6,11 @@ export default function RefLink() {
   const [refLink, setReferrer] = React.useState(null);
   const [searchParams] = useSearchParams();
 
-  let referrer = searchParams.get("ref");
+  const referrer = searchParams.get("ref");
 
+  // Should get the referrer from the url parameter if present. Use it to place a link
+  // back to the original site.
+  // Only accept urls that originate from a limited list of domains *.janelia.org
   React.useEffect(() => {
     if (referrer) {
       if (referrer.match(/^https?:\/\/[^/]*\.janelia\.org/)) {

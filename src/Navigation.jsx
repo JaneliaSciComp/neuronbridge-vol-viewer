@@ -8,9 +8,6 @@ import RefLink from "./RefLink";
 import "./Navigation.css";
 
 const { Header } = Layout;
-// Should get the referrer from the url parameter if present. Use it to place a link
-// back to the original site.
-// Only accept urls that originate from a limited list of domains *.janelia.org
 export default function Navigation() {
   return (
     <Header>
