@@ -1,3 +1,12 @@
 body {
   margin: 0px;
 }
+
+.ant-layout, #root {
+  height: 100%;
+}
+
+.ant-layout-content {
+  background:#222;
+  color:rgba(256,256,256,0.9);
+}
