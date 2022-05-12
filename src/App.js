@@ -1,5 +1,5 @@
 import Navigation from "./Navigation";
-import VolumeViewer from "./VolumeViewer";
+import VolumeDataLoader from "./VolumeDataLoader";
 import { Layout } from "antd";
 
 import "./App.css";
@@ -11,7 +11,7 @@ function App() {
     <Layout>
       <Navigation />
       <Content>
-        <VolumeViewer />
+        <VolumeDataLoader />
       </Content>
     </Layout>
   );
