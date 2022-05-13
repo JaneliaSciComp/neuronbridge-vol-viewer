@@ -18,8 +18,9 @@ import {
 import { makeSwcSurface, parseSwc } from "@janelia/web-vol-viewer/dist/Swc";
 import { Vol3dViewer } from "@janelia/web-vol-viewer";
 import { makeFluoTransferTex } from "@janelia/web-vol-viewer/dist/TransferFunctions";
-
 import ViewerControls from "./ViewerControls";
+
+import "./VolumeDataLoader.css";
 
 const alpha0 = 0;
 const alpha1 = 255;
@@ -246,9 +247,25 @@ export default function VolumeDataLoader() {
       </>
     );
   }
+  if (!h5jParam || !swcParam) {
+    return (
+      <div className="Vol3dPlaceHolder">
+        <div className="statusMessage">
+          <h1>Missing Source Files</h1>
+          <p>
+            Please return to{" "}
+            <a href="https://neuronbridge.janelia.org">neuronbridge</a> to
+            select a result for viewing.
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="Vol3dPlaceHolder">
-      <p>Volume Data Loading: {loadingPercent}%</p>
+      <div className="statusMessage">
+        <h1>Volume Data Loading: {loadingPercent}%</h1>
+      </div>
     </div>
   );
 }

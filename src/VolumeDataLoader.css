@@ -1,0 +1,22 @@
+.Vol3dPlaceHolder {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.statusMessage {
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+}
+
+.statusMessage h1 {
+  font-size: 3em;
+  color: #fff;
+}
