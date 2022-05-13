@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@janelia/web-vol-viewer": "^1.0.1",
+    "@janelia/web-h5j-loader": "^1.0.1",
+    "@janelia/web-vol-viewer": "^1.2.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",
