@@ -1,0 +1,27 @@
+service: janelia-neuronbridge-vol-viewer
+
+plugins:
+  - serverless-finch
+
+custom:
+  version : $npm_package_version
+  client:
+    bucketName: ${self:service}
+    distributionFolder: build
+    indexDocument: index.html
+    errorDocument: index.html
+    objectHeaders:
+      index.html:
+        - name: Cache-Control
+          value: max-age=0
+
+provider:
+  name: aws
+  region: us-east-1
+  deploymentBucket:
+    name: janelia-serverless-deployments
+    blockPublicAccess: true
+  tags:
+    PROJECT: NeuronBridge
+    VERSION: ${self:custom.version}
+    DEVELOPER: ${env:USER}
