@@ -160,7 +160,9 @@ export default function VolumeDataLoader() {
 
       setLoadingPercent(0);
       const data = await readH5JChannelUint8(
-        attrs.channels.names[channel],
+        // the h5j channels are 0 indexed and the channels passed from
+        // neuronbridge CDM search results a 1 indexed.
+        attrs.channels.names[channel - 1],
         fileH5J,
         onProgress,
         ff
