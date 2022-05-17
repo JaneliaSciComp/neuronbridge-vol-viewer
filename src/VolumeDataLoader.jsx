@@ -65,15 +65,20 @@ export default function VolumeDataLoader() {
     makeFluoTransferTex(alpha0, peak, dataGamma, alpha1, dataColor)
   );
 
-  const updateSearchParameters = (name, value) => {
+  const updateSearchParameters = (newParameters) => {
     let updatedSearchParams = new URLSearchParams(searchParams.toString());
-    updatedSearchParams.set(name, value);
+    if (!Array.isArray(newParameters)) {
+      newParameters = [newParameters];
+    }
+    newParameters.forEach((newParam) => {
+      updatedSearchParams.set(newParam.name, newParam.value);
+    });
     setSearchParams(updatedSearchParams.toString());
   };
 
   const onDataColorInputChange = (event) => {
     setDataColor(event.target.value);
-    updateSearchParameters("dc", event.target.value);
+    updateSearchParameters({ name: "dc", value: event.target.value });
     transferFunctionTexRef.current = makeFluoTransferTex(
       alpha0,
       peak,
@@ -87,7 +92,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setFinalGamma(event.target.valueAsNumber);
-      updateSearchParameters("fg", event.target.valueAsNumber);
+      updateSearchParameters({ name: "fg", value: event.target.valueAsNumber });
     }
   };
 
@@ -95,7 +100,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setPeak(event.target.valueAsNumber);
-      updateSearchParameters("dp", event.target.valueAsNumber);
+      updateSearchParameters({ name: "dp", value: event.target.valueAsNumber });
       transferFunctionTexRef.current = makeFluoTransferTex(
         alpha0,
         event.target.valueAsNumber,
@@ -110,7 +115,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setDataGamma(event.target.valueAsNumber);
-      updateSearchParameters("dg", event.target.valueAsNumber);
+      updateSearchParameters({ name: "dg", value: event.target.valueAsNumber });
       transferFunctionTexRef.current = makeFluoTransferTex(
         alpha0,
         peak,
@@ -125,7 +130,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setDtScale(event.target.valueAsNumber);
-      updateSearchParameters("ds", event.target.valueAsNumber);
+      updateSearchParameters({ name: "ds", value: event.target.valueAsNumber });
     }
   };
 
