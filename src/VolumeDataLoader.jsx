@@ -28,7 +28,7 @@ const peakDefault = 217;
 const dataGammaDefault = 0.5;
 
 export default function VolumeDataLoader() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [h5jUrl, setH5jUrl] = React.useState(null);
   const [channel, setChannel] = React.useState(null);
   const [swcUrl, setSwcUrl] = React.useState(null);
@@ -44,7 +44,7 @@ export default function VolumeDataLoader() {
   const [peak, setPeak] = React.useState(peakDefault);
   const [dataGamma, setDataGamma] = React.useState(dataGammaDefault);
   const [finalGamma, setFinalGamma] = React.useState(
-    Vol3dViewer.defaultProps.finalGamma
+    searchParams.get("fg") || Vol3dViewer.defaultProps.finalGamma
   );
   const [loadingPercent, setLoadingPercent] = React.useState(0);
   const [useLighting, setUseLighting] = React.useState(true);
@@ -74,6 +74,9 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setFinalGamma(event.target.valueAsNumber);
+      let updatedSearchParams = new URLSearchParams(searchParams.toString());
+      updatedSearchParams.set("fg", event.target.valueAsNumber);
+      setSearchParams(updatedSearchParams.toString());
     }
   };
 
@@ -179,7 +182,6 @@ export default function VolumeDataLoader() {
         setDtScale(Vol3dViewer.defaultProps.dtScale);
         setPeak(peakDefault);
         setDataGamma(dataGammaDefault);
-        setFinalGamma(Vol3dViewer.defaultProps.finalGamma);
       }
     }
 
