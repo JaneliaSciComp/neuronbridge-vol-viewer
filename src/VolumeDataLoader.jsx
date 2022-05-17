@@ -19,6 +19,7 @@ import { makeSwcSurface, parseSwc } from "@janelia/web-vol-viewer/dist/Swc";
 import { Vol3dViewer } from "@janelia/web-vol-viewer";
 import { makeFluoTransferTex } from "@janelia/web-vol-viewer/dist/TransferFunctions";
 import ViewerControls from "./ViewerControls";
+import FileInfo from "./FileInfo";
 
 import "./VolumeDataLoader.css";
 
@@ -39,7 +40,7 @@ export default function VolumeDataLoader() {
   const [channelSpecs, setChannelSpecs] = React.useState(null);
   const [dataUint8, setDataUint8] = React.useState(null);
   const [dtScale, setDtScale] = React.useState(
-    searchParams.get("ds") || Vol3dViewer.defaultProps.dtScale
+    parseInt(searchParams.get("ds"), 10) || Vol3dViewer.defaultProps.dtScale
   );
   const [peak, setPeak] = React.useState(searchParams.get("dp") || peakDefault);
   const [dataGamma, setDataGamma] = React.useState(
@@ -236,6 +237,7 @@ export default function VolumeDataLoader() {
   if (dataUint8) {
     return (
       <>
+        <FileInfo />
         <ViewerControls
           surfaceColor={surfaceColor}
           setSurfaceColor={setSurfaceColor}
