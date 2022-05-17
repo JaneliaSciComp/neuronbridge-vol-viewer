@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "antd";
+import useEventListener from "@use-it/event-listener";
 import "./ViewerControls.css";
 
 export default function ViewerControls({
@@ -35,6 +36,12 @@ export default function ViewerControls({
   const handleSurfaceToggle = () => {
     onSurfaceHide(!useSurface);
   };
+
+  useEventListener("keydown", ({ key }) => {
+    if (key === " ") {
+      onSurfaceHide(!useSurface);
+    }
+  });
 
   return (
     <div className="viewerControls">
