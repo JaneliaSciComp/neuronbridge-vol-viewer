@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useSearchParams } from "react-router-dom";
+import { Button } from "antd";
 import "./ViewerControls.css";
 
 export default function ViewerControls({
@@ -15,6 +16,8 @@ export default function ViewerControls({
   dataGamma,
   dtScale,
   onDtScaleChange,
+  onSurfaceHide,
+  useSurface,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -29,8 +32,15 @@ export default function ViewerControls({
     updateSearchParameters("sc", event.target.value);
   };
 
+  const handleSurfaceToggle = () => {
+    onSurfaceHide(!useSurface);
+  };
+
   return (
     <div className="viewerControls">
+      <Button size="small" type="primary" ghost onClick={handleSurfaceToggle}>
+        Toggle
+      </Button>
       <label htmlFor="surfaceColor">EM Color</label>
       <input
         id="surfaceColor"
@@ -109,4 +119,6 @@ ViewerControls.propTypes = {
   dataGamma: PropTypes.number.isRequired,
   dtScale: PropTypes.number.isRequired,
   onDtScaleChange: PropTypes.func.isRequired,
+  onSurfaceHide: PropTypes.func,
+  useSurface: PropTypes.bool.isRequired,
 };

@@ -244,6 +244,8 @@ export default function VolumeDataLoader() {
           dataGamma={dataGamma}
           dtScale={dtScale}
           onDtScaleChange={onDtScaleChange}
+          useSurface={useSurface}
+          onSurfaceHide={setUseSurface}
         />
         <Vol3dViewer
           volumeDataUint8={dataUint8}
