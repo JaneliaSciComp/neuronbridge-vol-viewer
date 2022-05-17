@@ -15,6 +15,12 @@ export default function RefLink() {
     if (referrer) {
       if (referrer.match(/^https?:\/\/[^/]*\.janelia\.org/)) {
         setReferrer(referrer);
+      } else if (
+        referrer.match(
+          /^https?:\/\/janelia-neuronbridge-web-dev.s3-website-us-east-1.amazonaws.com/
+        )
+      ) {
+        setReferrer(referrer);
       } else {
         console.log(referrer);
       }
