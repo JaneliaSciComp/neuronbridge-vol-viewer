@@ -39,10 +39,12 @@ export default function VolumeDataLoader() {
   const [channelSpecs, setChannelSpecs] = React.useState(null);
   const [dataUint8, setDataUint8] = React.useState(null);
   const [dtScale, setDtScale] = React.useState(
-    Vol3dViewer.defaultProps.dtScale
+    searchParams.get("ds") || Vol3dViewer.defaultProps.dtScale
   );
-  const [peak, setPeak] = React.useState(peakDefault);
-  const [dataGamma, setDataGamma] = React.useState(dataGammaDefault);
+  const [peak, setPeak] = React.useState(searchParams.get("dp") || peakDefault);
+  const [dataGamma, setDataGamma] = React.useState(
+    searchParams.get("dg") || dataGammaDefault
+  );
   const [finalGamma, setFinalGamma] = React.useState(
     searchParams.get("fg") || Vol3dViewer.defaultProps.finalGamma
   );
@@ -50,8 +52,12 @@ export default function VolumeDataLoader() {
   const [useLighting, setUseLighting] = React.useState(true);
   const [useSurface, setUseSurface] = React.useState(false);
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
-  const [surfaceColor, setSurfaceColor] = React.useState("#00ff00");
-  const [dataColor, setDataColor] = React.useState("#ff00ff");
+  const [surfaceColor, setSurfaceColor] = React.useState(
+    searchParams.get("sc") || "#00ff00"
+  );
+  const [dataColor, setDataColor] = React.useState(
+    searchParams.get("dc") || "#ff00ff"
+  );
 
   const allowThrottledEvent = React.useRef(false);
 
@@ -59,8 +65,15 @@ export default function VolumeDataLoader() {
     makeFluoTransferTex(alpha0, peak, dataGamma, alpha1, dataColor)
   );
 
+  const updateSearchParameters = (name, value) => {
+    let updatedSearchParams = new URLSearchParams(searchParams.toString());
+    updatedSearchParams.set(name, value);
+    setSearchParams(updatedSearchParams.toString());
+  };
+
   const onDataColorInputChange = (event) => {
     setDataColor(event.target.value);
+    updateSearchParameters("dc", event.target.value);
     transferFunctionTexRef.current = makeFluoTransferTex(
       alpha0,
       peak,
@@ -74,9 +87,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setFinalGamma(event.target.valueAsNumber);
-      let updatedSearchParams = new URLSearchParams(searchParams.toString());
-      updatedSearchParams.set("fg", event.target.valueAsNumber);
-      setSearchParams(updatedSearchParams.toString());
+      updateSearchParameters("fg", event.target.valueAsNumber);
     }
   };
 
@@ -84,6 +95,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setPeak(event.target.valueAsNumber);
+      updateSearchParameters("dp", event.target.valueAsNumber);
       transferFunctionTexRef.current = makeFluoTransferTex(
         alpha0,
         event.target.valueAsNumber,
@@ -98,6 +110,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setDataGamma(event.target.valueAsNumber);
+      updateSearchParameters("dg", event.target.valueAsNumber);
       transferFunctionTexRef.current = makeFluoTransferTex(
         alpha0,
         peak,
@@ -112,6 +125,7 @@ export default function VolumeDataLoader() {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
       setDtScale(event.target.valueAsNumber);
+      updateSearchParameters("ds", event.target.valueAsNumber);
     }
   };
 
@@ -179,9 +193,6 @@ export default function VolumeDataLoader() {
         // to make the `THREE.DataTexture3D`.
         const dUint8 = new Uint8Array(data.buffer);
         setDataUint8(dUint8);
-        setDtScale(Vol3dViewer.defaultProps.dtScale);
-        setPeak(peakDefault);
-        setDataGamma(dataGammaDefault);
       }
     }
 

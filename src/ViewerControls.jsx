@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useSearchParams } from "react-router-dom";
 import "./ViewerControls.css";
 
 export default function ViewerControls({
@@ -15,8 +16,17 @@ export default function ViewerControls({
   dtScale,
   onDtScaleChange,
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const updateSearchParameters = (name, value) => {
+    let updatedSearchParams = new URLSearchParams(searchParams.toString());
+    updatedSearchParams.set(name, value);
+    setSearchParams(updatedSearchParams.toString());
+  };
+
   const onSurfaceColorInputChange = (event) => {
     setSurfaceColor(event.target.value);
+    updateSearchParameters("sc", event.target.value);
   };
 
   return (
