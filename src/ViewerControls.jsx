@@ -19,6 +19,8 @@ export default function ViewerControls({
   onDtScaleChange,
   onSurfaceHide,
   useSurface,
+  mirroredX,
+  onMirrorChange,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -35,6 +37,10 @@ export default function ViewerControls({
 
   const handleSurfaceToggle = () => {
     onSurfaceHide(!useSurface);
+  };
+
+  const handleMirrorToggle = () => {
+    onMirrorChange(!mirroredX);
   };
 
   useEventListener("keydown", ({ key }) => {
@@ -56,6 +62,9 @@ export default function ViewerControls({
         value={surfaceColor}
         onChange={onSurfaceColorInputChange}
       />
+      <Button size="small" type="primary" ghost onClick={handleMirrorToggle}>
+        {mirroredX ? "Unmirror" : "Mirror"}
+      </Button>
       <label htmlFor="dataColor">LM Color</label>
       <input
         id="dataColor"
@@ -128,4 +137,6 @@ ViewerControls.propTypes = {
   onDtScaleChange: PropTypes.func.isRequired,
   onSurfaceHide: PropTypes.func,
   useSurface: PropTypes.bool.isRequired,
+  mirroredX: PropTypes.bool.isRequired,
+  onMirrorChange: PropTypes.func.isRequired,
 };
