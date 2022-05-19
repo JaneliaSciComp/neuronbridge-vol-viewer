@@ -50,6 +50,7 @@ export default function VolumeDataLoader() {
     searchParams.get("fg") || Vol3dViewer.defaultProps.finalGamma
   );
   const [loadingPercent, setLoadingPercent] = React.useState(0);
+  const [h5jLoadingError, setH5jLoadingError] = React.useState(null);
   const [useLighting, setUseLighting] = React.useState(true);
   const [useSurface, setUseSurface] = React.useState(false);
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
@@ -232,6 +233,7 @@ export default function VolumeDataLoader() {
   };
 
   React.useEffect(() => {
+    setH5jLoadingError(null);
     async function loadh5j(h5jUrl, channel) {
       const fileH5J = await openH5J(h5jUrl);
       const attrs = getH5JAttrs(fileH5J);
@@ -243,8 +245,12 @@ export default function VolumeDataLoader() {
 
       let ff = ffmpegWasm;
       if (!ff) {
-        ff = await createFFmpegForEnv();
-        setFfmpegWasm(ff);
+        try {
+          ff = await createFFmpegForEnv();
+          setFfmpegWasm(ff);
+        } catch (e) {
+          setH5jLoadingError(e.message);
+        }
       }
 
       setLoadingPercent(0);
@@ -298,6 +304,19 @@ export default function VolumeDataLoader() {
       loadSwcData(swcUrl);
     }
   }, [swcUrl, surfaceColor, units, voxelSize, volumeSize]);
+
+  if (h5jLoadingError) {
+    let errorMessage = `Error Loading the volume data: ${h5jLoadingError}`;
+    if (h5jLoadingError.match(/out of memory/i)) {
+      errorMessage =
+        "This device does not have sufficient memory available to render the supplied volume.";
+    }
+    return (
+      <div className="statusMessage">
+        <p className="errorMessage">{errorMessage}</p>
+      </div>
+    );
+  }
 
   if (dataUint8) {
     return (
