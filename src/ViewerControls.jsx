@@ -19,6 +19,8 @@ export default function ViewerControls({
   onDtScaleChange,
   onSurfaceHide,
   useSurface,
+  setUseLighting,
+  useLighting,
   mirroredX,
   onMirrorChange,
 }) {
@@ -46,6 +48,8 @@ export default function ViewerControls({
   useEventListener("keydown", ({ key }) => {
     if (key === " ") {
       onSurfaceHide(!useSurface);
+    } else if (key === "l") {
+      setUseLighting(!useLighting);
     }
   });
 
@@ -137,6 +141,8 @@ ViewerControls.propTypes = {
   onDtScaleChange: PropTypes.func.isRequired,
   onSurfaceHide: PropTypes.func,
   useSurface: PropTypes.bool.isRequired,
+  setUseLighting: PropTypes.func.isRequired,
+  useLighting: PropTypes.bool.isRequired,
   mirroredX: PropTypes.bool.isRequired,
   onMirrorChange: PropTypes.func.isRequired,
 };

@@ -1,4 +1,6 @@
 import { useSearchParams } from "react-router-dom";
+import { Row, Col } from "antd";
+import "./FileInfo.css";
 
 function convertUrlToFileName(url) {
   const urlObject = new URL(url);
@@ -14,9 +16,9 @@ export default function FileInfo() {
   const swcUrl = searchParams.get("swc");
 
   return (
-    <div>
-      <p>LM: {convertUrlToFileName(h5jUrl)}</p>
-      <p>EM: {convertUrlToFileName(swcUrl)}</p>
-    </div>
+    <Row className="fileInfo">
+      <Col span={16}>LM: {convertUrlToFileName(h5jUrl)}</Col>
+      <Col span={8}>EM: {convertUrlToFileName(swcUrl)}</Col>
+    </Row>
   );
 }
