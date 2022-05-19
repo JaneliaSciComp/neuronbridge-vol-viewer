@@ -53,6 +53,7 @@ export default function VolumeDataLoader() {
   const [useLighting, setUseLighting] = React.useState(true);
   const [useSurface, setUseSurface] = React.useState(false);
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
+  const [speedUp, setSpeedUp] = React.useState(3);
   const [surfaceColor, setSurfaceColor] = React.useState(
     searchParams.get("sc") || "#00ff00"
   );
@@ -321,6 +322,8 @@ export default function VolumeDataLoader() {
           setUseLighting={setUseLighting}
           mirroredX={mirroredX}
           onMirrorChange={setMirroredX}
+          onSpeedUpChange={setSpeedUp}
+          speedUp={speedUp}
         />
         <Vol3dViewer
           volumeDataUint8={dataUint8}
@@ -339,6 +342,7 @@ export default function VolumeDataLoader() {
           useVolumeMirrorX={mirroredX}
           cameraPosition={initialCameraPosition}
           cameraUp={initialCameraUp}
+          interactionSpeedup={speedUp}
         />
       </>
     );

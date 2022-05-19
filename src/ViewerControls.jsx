@@ -23,6 +23,8 @@ export default function ViewerControls({
   useLighting,
   mirroredX,
   onMirrorChange,
+  onSpeedUpChange,
+  speedUp,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -122,6 +124,17 @@ export default function ViewerControls({
         step="0.1"
         onChange={onFinalGammaChange}
       />
+      <label htmlFor="speedUp">Speed Up</label>
+      <input
+        name="speedUp"
+        id="speedUp"
+        type="number"
+        value={speedUp}
+        min="1"
+        max="20"
+        step="1"
+        onChange={(event) => onSpeedUpChange(parseInt(event.target.value, 10))}
+      />
     </div>
   );
 }
@@ -145,4 +158,6 @@ ViewerControls.propTypes = {
   useLighting: PropTypes.bool.isRequired,
   mirroredX: PropTypes.bool.isRequired,
   onMirrorChange: PropTypes.func.isRequired,
+  onSpeedUpChange: PropTypes.func.isRequired,
+  speedUp: PropTypes.number.isRequired,
 };
