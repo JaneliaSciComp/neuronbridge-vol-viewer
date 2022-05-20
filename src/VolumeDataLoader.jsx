@@ -109,9 +109,9 @@ export default function VolumeDataLoader() {
         searchParams.get("upz")
       ) {
         defaultUp = [
-          searchParams.get("upx"),
-          searchParams.get("upy"),
-          searchParams.get("upz"),
+          parseFloat(searchParams.get("upx"), 10),
+          parseFloat(searchParams.get("upy"), 10),
+          parseFloat(searchParams.get("upz"), 10),
         ];
       }
       setInitialCameraUp(defaultUp);
