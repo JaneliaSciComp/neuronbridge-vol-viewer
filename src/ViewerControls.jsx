@@ -1,14 +1,8 @@
 import PropTypes from "prop-types";
-import { useSearchParams } from "react-router-dom";
-import { Button } from "antd";
 import useEventListener from "@use-it/event-listener";
 import "./ViewerControls.css";
 
 export default function ViewerControls({
-  surfaceColor,
-  setSurfaceColor,
-  dataColor,
-  onDataColorChange,
   onFinalGammaChange,
   finalGamma,
   peak,
@@ -17,68 +11,19 @@ export default function ViewerControls({
   dataGamma,
   dtScale,
   onDtScaleChange,
-  onSurfaceHide,
-  useSurface,
   setUseLighting,
   useLighting,
-  mirroredX,
-  onMirrorChange,
   onSpeedUpChange,
   speedUp,
 }) {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const updateSearchParameters = (name, value) => {
-    let updatedSearchParams = new URLSearchParams(searchParams.toString());
-    updatedSearchParams.set(name, value);
-    setSearchParams(updatedSearchParams.toString());
-  };
-
-  const onSurfaceColorInputChange = (event) => {
-    setSurfaceColor(event.target.value);
-    updateSearchParameters("sc", event.target.value);
-  };
-
-  const handleSurfaceToggle = () => {
-    onSurfaceHide(!useSurface);
-  };
-
-  const handleMirrorToggle = () => {
-    onMirrorChange(!mirroredX);
-  };
-
   useEventListener("keydown", ({ key }) => {
-    if (key === " ") {
-      onSurfaceHide(!useSurface);
-    } else if (key === "l") {
+    if (key === "l") {
       setUseLighting(!useLighting);
     }
   });
 
   return (
     <div className="viewerControls">
-      <Button size="small" type="primary" ghost onClick={handleSurfaceToggle}>
-        Toggle
-      </Button>
-      <label htmlFor="surfaceColor">EM Color</label>
-      <input
-        id="surfaceColor"
-        name="surfaceColor"
-        type="color"
-        value={surfaceColor}
-        onChange={onSurfaceColorInputChange}
-      />
-      <Button size="small" type="primary" ghost onClick={handleMirrorToggle}>
-        {mirroredX ? "Unmirror" : "Mirror"}
-      </Button>
-      <label htmlFor="dataColor">LM Color</label>
-      <input
-        id="dataColor"
-        name="dataColor"
-        type="color"
-        value={dataColor}
-        onChange={onDataColorChange}
-      />
       <label htmlFor="dataPeak">Data Peak</label>
       <input
         id="dataPeak"
@@ -140,10 +85,6 @@ export default function ViewerControls({
 }
 
 ViewerControls.propTypes = {
-  surfaceColor: PropTypes.string.isRequired,
-  setSurfaceColor: PropTypes.func.isRequired,
-  dataColor: PropTypes.string.isRequired,
-  onDataColorChange: PropTypes.func.isRequired,
   onFinalGammaChange: PropTypes.func.isRequired,
   finalGamma: PropTypes.number.isRequired,
   onPeakChange: PropTypes.func.isRequired,
@@ -152,12 +93,8 @@ ViewerControls.propTypes = {
   dataGamma: PropTypes.number.isRequired,
   dtScale: PropTypes.number.isRequired,
   onDtScaleChange: PropTypes.func.isRequired,
-  onSurfaceHide: PropTypes.func,
-  useSurface: PropTypes.bool.isRequired,
   setUseLighting: PropTypes.func.isRequired,
   useLighting: PropTypes.bool.isRequired,
-  mirroredX: PropTypes.bool.isRequired,
-  onMirrorChange: PropTypes.func.isRequired,
   onSpeedUpChange: PropTypes.func.isRequired,
   speedUp: PropTypes.number.isRequired,
 };

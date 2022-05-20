@@ -321,12 +321,17 @@ export default function VolumeDataLoader() {
   if (dataUint8) {
     return (
       <>
-        <FileInfo />
-        <ViewerControls
+        <FileInfo
           surfaceColor={surfaceColor}
           setSurfaceColor={setSurfaceColor}
           dataColor={dataColor}
           onDataColorChange={onDataColorInputChange}
+          mirroredX={mirroredX}
+          onMirrorChange={setMirroredX}
+          useSurface={useSurface}
+          onSurfaceHide={setUseSurface}
+        />
+        <ViewerControls
           onFinalGammaChange={onFinalGammaChange}
           finalGamma={finalGamma}
           peak={peak}
@@ -335,12 +340,8 @@ export default function VolumeDataLoader() {
           dataGamma={dataGamma}
           dtScale={dtScale}
           onDtScaleChange={onDtScaleChange}
-          useSurface={useSurface}
-          onSurfaceHide={setUseSurface}
           useLighting={useLighting}
           setUseLighting={setUseLighting}
-          mirroredX={mirroredX}
-          onMirrorChange={setMirroredX}
           onSpeedUpChange={setSpeedUp}
           speedUp={speedUp}
         />
