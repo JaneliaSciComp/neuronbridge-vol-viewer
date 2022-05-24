@@ -28,6 +28,7 @@ const alpha0 = 0;
 const alpha1 = 255;
 const peakDefault = 217;
 const dataGammaDefault = 0.5;
+const defaultSpeedUp = 2;
 
 export default function VolumeDataLoader() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,7 +55,7 @@ export default function VolumeDataLoader() {
   const [useLighting, setUseLighting] = React.useState(true);
   const [useSurface, setUseSurface] = React.useState(false);
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
-  const [speedUp, setSpeedUp] = React.useState(3);
+  const [speedUp, setSpeedUp] = React.useState(defaultSpeedUp);
   const [surfaceColor, setSurfaceColor] = React.useState(
     searchParams.get("sc") || "#00ff00"
   );
