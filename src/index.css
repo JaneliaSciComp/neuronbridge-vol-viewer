@@ -10,3 +10,26 @@ body {
   background:#222;
   color:rgba(256,256,256,0.9);
 }
+
+.ant-btn-background-ghost.ant-btn-primary {
+  color: #008b94;
+  border-color: #008b94;
+}
+
+.ant-btn-background-ghost.ant-btn-primary:hover {
+  color: #00cbd8;
+  border-color: #00cbd8;
+}
+
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-item:hover {
+  background: #008b94;
+}
+
+.ant-layout-header {
+ background: #000b0c;
+}
+
+.ant-menu.ant-menu-dark {
+  background: #000b0c;
+}
+
