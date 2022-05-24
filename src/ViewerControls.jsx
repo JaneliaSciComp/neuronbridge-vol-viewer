@@ -49,18 +49,19 @@ export default function ViewerControls({
         step="0.01"
         onChange={onDataGammaChange}
       />
-      <label htmlFor="sampleSpacing">Sample Spacing</label>
-      <input
-        name="sampleSpacing"
-        id="sampleSpacing"
-        type="number"
-        value={dtScale}
-        min="0.1"
-        max="10"
-        step="0.1"
-        onChange={onDtScaleChange}
-      />
-
+      <span style={{ display: "none" }}>
+        <label htmlFor="sampleSpacing">Sample Spacing</label>
+        <input
+          name="sampleSpacing"
+          id="sampleSpacing"
+          type="number"
+          value={dtScale}
+          min="0.1"
+          max="10"
+          step="0.1"
+          onChange={onDtScaleChange}
+        />
+      </span>
       <label htmlFor="finalGamma">Final Gamma</label>
       <input
         name="finalGamma"
