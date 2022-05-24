@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import useEventListener from "@use-it/event-listener";
 import "./ViewerControls.css";
+import { Tooltip } from "antd";
 
 export default function ViewerControls({
   onFinalGammaChange,
@@ -24,17 +25,19 @@ export default function ViewerControls({
 
   return (
     <div className="viewerControls">
-      <label htmlFor="dataPeak">Data Peak</label>
-      <input
-        id="dataPeak"
-        name="dataPeak"
-        type="number"
-        min="0"
-        max="255"
-        step="1"
-        value={peak}
-        onChange={onPeakChange}
-      />
+      <Tooltip placement="bottom" color="#008b94" title="Data Peak">
+        <label htmlFor="dataPeak">Data Peak</label>
+        <input
+          id="dataPeak"
+          name="dataPeak"
+          type="number"
+          min="0"
+          max="255"
+          step="1"
+          value={peak}
+          onChange={onPeakChange}
+        />
+      </Tooltip>
       <label htmlFor="dataGamma">Data Gamma</label>
       <input
         name="dataGamma"
