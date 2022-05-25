@@ -1,7 +1,12 @@
 import PropTypes from "prop-types";
 import useEventListener from "@use-it/event-listener";
+import { Tooltip, Slider, Row, Col, Button, Divider, Typography } from "antd";
+import { convertUrlToFileName } from "./utils";
+import { useSearchParams } from "react-router-dom";
+
 import "./ViewerControls.css";
-import { Tooltip, Slider } from "antd";
+
+const { Text } = Typography;
 
 export default function ViewerControls({
   onFinalGammaChange,
@@ -17,12 +22,29 @@ export default function ViewerControls({
   onSpeedUpChange,
   speedUp,
   dataColor,
+  surfaceColor,
+  setSurfaceColor,
+  onSurfaceHide,
+  useSurface,
+  mirroredX,
+  onMirrorChange,
+  onDataColorChange,
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const swcUrl = searchParams.get("swc");
+  const h5jUrl = searchParams.get("h5j");
+
   useEventListener("keydown", ({ key }) => {
     if (key === "l") {
       setUseLighting(!useLighting);
     }
   });
+
+  const updateSearchParameters = (name, value) => {
+    let updatedSearchParams = new URLSearchParams(searchParams.toString());
+    updatedSearchParams.set(name, value);
+    setSearchParams(updatedSearchParams.toString());
+  };
 
   const onPeakInputChange = (event) => {
     onPeakChange(event.target.valueAsNumber);
@@ -36,102 +58,203 @@ export default function ViewerControls({
     onFinalGammaChange(event.target.valueAsNumber);
   };
 
+  const onSurfaceColorInputChange = (event) => {
+    setSurfaceColor(event.target.value);
+    updateSearchParameters("sc", event.target.value);
+  };
+
+  const handleSurfaceToggle = () => {
+    onSurfaceHide(!useSurface);
+  };
+
+  const handleMirrorToggle = () => {
+    onMirrorChange(!mirroredX);
+  };
+
   return (
-    <div className="viewerControls">
+    <>
+      <Row className="fileControls">
+        <Col span={16}>
+          <label htmlFor="dataColor">
+            <Text
+              ellipsis={{ tooltip: convertUrlToFileName(h5jUrl) }}
+              style={{ width: 400, color: "#fff" }}
+            >
+              LM: {convertUrlToFileName(h5jUrl)}
+            </Text>
+          </label>
+        </Col>
+        <Col span={3}>
+          <input
+            id="dataColor"
+            name="dataColor"
+            type="color"
+            value={dataColor}
+            onChange={onDataColorChange}
+          />
+        </Col>
+        <Col span={5}>
+          <Button
+            size="small"
+            type="primary"
+            ghost
+            onClick={handleMirrorToggle}
+          >
+            {mirroredX ? "Unmirror" : "Mirror"}
+          </Button>
+        </Col>
+      </Row>
+
       <Tooltip placement="bottom" color="#008b94" title="Data Peak">
-        <label htmlFor="dataPeak">Data Peak</label>
-        <input
-          id="dataPeak"
-          name="dataPeak"
-          type="number"
-          min="0"
-          max="255"
-          step="1"
-          value={peak}
-          onChange={onPeakInputChange}
-        />
-        <Slider
-          min={0}
-          max={255}
-          value={parseInt(peak, 10)}
-          onChange={onPeakChange}
-          step={1}
-          railStyle={{
-            background: `linear-gradient(.25turn, ${dataColor}, #000000)`,
-          }}
-        />
+        <Row className="viewerControls">
+          <label htmlFor="dataPeak">Data Peak</label>
+        </Row>
+        <Row className="viewerControls">
+          <Col span={6}>
+            <input
+              id="dataPeak"
+              name="dataPeak"
+              type="number"
+              min="0"
+              max="255"
+              step="1"
+              value={peak}
+              onChange={onPeakInputChange}
+            />
+          </Col>
+          <Col span={18}>
+            <Slider
+              min={0}
+              max={255}
+              value={parseInt(peak, 10)}
+              onChange={onPeakChange}
+              step={1}
+              railStyle={{
+                background: `linear-gradient(.25turn, ${dataColor}, #000000)`,
+              }}
+            />
+          </Col>
+        </Row>
       </Tooltip>
-
-      <label htmlFor="dataGamma">Data Gamma</label>
-      <input
-        name="dataGamma"
-        id="dataGamma"
-        type="number"
-        value={dataGamma}
-        min="0"
-        max="6"
-        step="0.01"
-        onChange={onDataGammaInputChange}
-      />
-      <Slider
-        min={0}
-        max={6}
-        value={parseFloat(dataGamma, 10)}
-        onChange={onDataGammaChange}
-        step={0.01}
-        railStyle={{
-          background: `linear-gradient(.25turn, #000000, ${dataColor})`,
-        }}
-      />
-
-      <span style={{ display: "none" }}>
-        <label htmlFor="sampleSpacing">Sample Spacing</label>
+      <Row className="viewerControls">
+        <label htmlFor="dataGamma">Data Gamma</label>
+      </Row>
+      <Row className="viewerControls">
+        <Col span={6}>
+          <input
+            name="dataGamma"
+            id="dataGamma"
+            type="number"
+            value={dataGamma}
+            min="0"
+            max="6"
+            step="0.01"
+            onChange={onDataGammaInputChange}
+          />
+        </Col>
+        <Col span={18}>
+          <Slider
+            min={0}
+            max={6}
+            value={parseFloat(dataGamma, 10)}
+            onChange={onDataGammaChange}
+            step={0.01}
+            railStyle={{
+              background: `linear-gradient(.25turn, #000000, ${dataColor})`,
+            }}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <span style={{ display: "none" }}>
+          <label htmlFor="sampleSpacing">Sample Spacing</label>
+          <input
+            name="sampleSpacing"
+            id="sampleSpacing"
+            type="number"
+            value={dtScale}
+            min="0.1"
+            max="10"
+            step="0.1"
+            onChange={onDtScaleChange}
+          />
+        </span>
+      </Row>
+      <Row className="viewerControls">
+        <label htmlFor="finalGamma">Final Gamma</label>
+      </Row>
+      <Row className="viewerControls">
+        <Col span={6}>
+          <input
+            name="finalGamma"
+            id="finalGamma"
+            type="number"
+            value={finalGamma}
+            min="0.1"
+            max="10"
+            step="0.1"
+            onChange={onFinalGammaInputChange}
+          />
+        </Col>
+        <Col span={18}>
+          <Slider
+            min={0.1}
+            max={10}
+            value={parseFloat(finalGamma, 10)}
+            onChange={onFinalGammaChange}
+            step={0.1}
+            railStyle={{
+              background: `linear-gradient(.25turn, #000000, ${dataColor})`,
+            }}
+          />
+        </Col>
+      </Row>
+      <Divider />
+      <Row className="fileControls">
+        <Col span={16}>
+          <label htmlFor="surfaceColor">
+            EM: {convertUrlToFileName(swcUrl)}
+          </label>
+        </Col>
+        <Col span={3}>
+          <input
+            id="surfaceColor"
+            name="surfaceColor"
+            type="color"
+            value={surfaceColor}
+            onChange={onSurfaceColorInputChange}
+          />
+        </Col>
+        <Col span={5}>
+          <Button
+            size="small"
+            type="primary"
+            ghost
+            onClick={handleSurfaceToggle}
+          >
+            Toggle
+          </Button>
+        </Col>
+      </Row>
+      <Divider />
+      <Row className="viewerControls">
+        <label htmlFor="speedUp">Speed Up</label>
+      </Row>
+      <Row className="viewerControls">
         <input
-          name="sampleSpacing"
-          id="sampleSpacing"
+          name="speedUp"
+          id="speedUp"
           type="number"
-          value={dtScale}
-          min="0.1"
-          max="10"
-          step="0.1"
-          onChange={onDtScaleChange}
+          value={speedUp}
+          min="1"
+          max="20"
+          step="1"
+          onChange={(event) =>
+            onSpeedUpChange(parseInt(event.target.value, 10))
+          }
         />
-      </span>
-
-      <label htmlFor="finalGamma">Final Gamma</label>
-      <input
-        name="finalGamma"
-        id="finalGamma"
-        type="number"
-        value={finalGamma}
-        min="0.1"
-        max="10"
-        step="0.1"
-        onChange={onFinalGammaInputChange}
-      />
-      <Slider
-        min={0.1}
-        max={10}
-        value={parseFloat(finalGamma, 10)}
-        onChange={onFinalGammaChange}
-        step={0.1}
-        railStyle={{
-          background: `linear-gradient(.25turn, #000000, ${dataColor})`,
-        }}
-      />
-
-      <label htmlFor="speedUp">Speed Up</label>
-      <input
-        name="speedUp"
-        id="speedUp"
-        type="number"
-        value={speedUp}
-        min="1"
-        max="20"
-        step="1"
-        onChange={(event) => onSpeedUpChange(parseInt(event.target.value, 10))}
-      />
-    </div>
+      </Row>
+    </>
   );
 }
 
@@ -149,4 +272,11 @@ ViewerControls.propTypes = {
   onSpeedUpChange: PropTypes.func.isRequired,
   speedUp: PropTypes.number.isRequired,
   dataColor: PropTypes.string.isRequired,
+  onSurfaceHide: PropTypes.func,
+  useSurface: PropTypes.bool.isRequired,
+  surfaceColor: PropTypes.string.isRequired,
+  setSurfaceColor: PropTypes.func.isRequired,
+  onDataColorChange: PropTypes.func.isRequired,
+  mirroredX: PropTypes.bool.isRequired,
+  onMirrorChange: PropTypes.func.isRequired,
 };

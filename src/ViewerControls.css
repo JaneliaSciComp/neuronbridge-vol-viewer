@@ -3,6 +3,10 @@
   text-align: center;
 }
 
+.viewerControls label {
+  margin-left: 1em;
+}
+
 .viewerControls input {
   color:#000;
   margin: 0 2em 0 1em;
@@ -16,10 +20,20 @@
   background: #333;
 }
 
-
 .viewerControls button {
   margin-right: 1em;
 }
+
+.fileControls input[type=color] {
+  height : 20px;
+  width: 20px;
+  margin: 0 1em 0 0.3em;
+}
+
+.fileControls {
+  margin: 1em;
+}
+
 /*
 .ant-slider-rail {
   background: linear-gradient(.25turn, #ff00ff, #000000);

@@ -7,6 +7,10 @@
   position: relative;
 }
 
+.Vol3dViewer {
+  height: 100%;
+}
+
 .statusMessage {
   text-align: center;
   width: 100%;

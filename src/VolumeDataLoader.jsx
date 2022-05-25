@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "react-router-dom";
+import { Row, Col } from "antd";
 import {
   getH5JAttrs,
   openH5J,
@@ -19,7 +20,6 @@ import { makeSwcSurface, parseSwc } from "@janelia/web-vol-viewer/dist/Swc";
 import { Vol3dViewer } from "@janelia/web-vol-viewer";
 import { makeFluoTransferTex } from "@janelia/web-vol-viewer/dist/TransferFunctions";
 import ViewerControls from "./ViewerControls";
-import FileInfo from "./FileInfo";
 import { useDebouncedCallback } from "use-debounce";
 
 import "./VolumeDataLoader.css";
@@ -321,52 +321,53 @@ export default function VolumeDataLoader() {
 
   if (dataUint8) {
     return (
-      <>
-        <FileInfo
-          surfaceColor={surfaceColor}
-          setSurfaceColor={setSurfaceColor}
-          dataColor={dataColor}
-          onDataColorChange={onDataColorInputChange}
-          mirroredX={mirroredX}
-          onMirrorChange={setMirroredX}
-          useSurface={useSurface}
-          onSurfaceHide={setUseSurface}
-        />
-        <ViewerControls
-          onFinalGammaChange={onFinalGammaChange}
-          finalGamma={finalGamma}
-          peak={peak}
-          onPeakChange={onPeakChange}
-          onDataGammaChange={onDataGammaChange}
-          dataGamma={dataGamma}
-          dtScale={dtScale}
-          dataColor={dataColor}
-          onDtScaleChange={onDtScaleChange}
-          useLighting={useLighting}
-          setUseLighting={setUseLighting}
-          onSpeedUpChange={setSpeedUp}
-          speedUp={speedUp}
-        />
-        <Vol3dViewer
-          volumeDataUint8={dataUint8}
-          volumeSize={volumeSize}
-          voxelSize={voxelSize}
-          dtScale={dtScale}
-          transferFunctionTex={transferFunctionTexRef.current}
-          finalGamma={finalGamma}
-          useLighting={useLighting}
-          useSurface={useSurface}
-          surfaceMesh={swcSurfaceMesh}
-          surfaceColor={surfaceColor}
-          dataColor={dataColor}
-          onWebGLRender={onWebGLRender}
-          onCameraChange={onCameraChange}
-          useVolumeMirrorX={mirroredX}
-          cameraPosition={initialCameraPosition}
-          cameraUp={initialCameraUp}
-          interactionSpeedup={speedUp}
-        />
-      </>
+      <Row style={{ height: "100%" }}>
+        <Col span={16}>
+          <Vol3dViewer
+            volumeDataUint8={dataUint8}
+            volumeSize={volumeSize}
+            voxelSize={voxelSize}
+            dtScale={dtScale}
+            transferFunctionTex={transferFunctionTexRef.current}
+            finalGamma={finalGamma}
+            useLighting={useLighting}
+            useSurface={useSurface}
+            surfaceMesh={swcSurfaceMesh}
+            surfaceColor={surfaceColor}
+            dataColor={dataColor}
+            onWebGLRender={onWebGLRender}
+            onCameraChange={onCameraChange}
+            useVolumeMirrorX={mirroredX}
+            cameraPosition={initialCameraPosition}
+            cameraUp={initialCameraUp}
+            interactionSpeedup={speedUp}
+          />
+        </Col>
+        <Col span={8}>
+          <ViewerControls
+            onFinalGammaChange={onFinalGammaChange}
+            finalGamma={finalGamma}
+            peak={peak}
+            onPeakChange={onPeakChange}
+            onDataGammaChange={onDataGammaChange}
+            dataGamma={dataGamma}
+            dtScale={dtScale}
+            onDtScaleChange={onDtScaleChange}
+            useLighting={useLighting}
+            setUseLighting={setUseLighting}
+            onSpeedUpChange={setSpeedUp}
+            speedUp={speedUp}
+            dataColor={dataColor}
+            onDataColorChange={onDataColorInputChange}
+            useSurface={useSurface}
+            onSurfaceHide={setUseSurface}
+            surfaceColor={surfaceColor}
+            setSurfaceColor={setSurfaceColor}
+            mirroredX={mirroredX}
+            onMirrorChange={setMirroredX}
+          />
+        </Col>
+      </Row>
     );
   }
   if (!h5jParam || !swcParam) {
