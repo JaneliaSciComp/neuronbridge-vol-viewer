@@ -34,6 +34,15 @@
   margin: 1em;
 }
 
+.controlsDivider {
+  border:none;
+  height: 1px;
+  color: #444;
+  background-color: #444;
+  width: 85%;
+  margin:1em auto;
+}
+
 /*
 .ant-slider-rail {
   background: linear-gradient(.25turn, #ff00ff, #000000);

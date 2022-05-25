@@ -1,12 +1,18 @@
 import PropTypes from "prop-types";
 import useEventListener from "@use-it/event-listener";
-import { Tooltip, Slider, Row, Col, Button, Divider, Typography } from "antd";
+import { Tooltip, Slider, Row, Col, Button, Typography } from "antd";
 import { convertUrlToFileName } from "./utils";
 import { useSearchParams } from "react-router-dom";
 
 import "./ViewerControls.css";
 
 const { Text } = Typography;
+const dataPeakMin = 0;
+const dataPeakMax = 255;
+const dataGammaMin = 0;
+const dataGammaMax = 1.5;
+const finalGammaMin = 0.1;
+const finalGammaMax = 10;
 
 export default function ViewerControls({
   onFinalGammaChange,
@@ -37,6 +43,8 @@ export default function ViewerControls({
   useEventListener("keydown", ({ key }) => {
     if (key === "l") {
       setUseLighting(!useLighting);
+    } else if (key === " ") {
+      onSurfaceHide(!useSurface);
     }
   });
 
@@ -105,9 +113,13 @@ export default function ViewerControls({
         </Col>
       </Row>
 
-      <Tooltip placement="bottom" color="#008b94" title="Data Peak">
+      <Tooltip
+        placement="left"
+        color="#008b94"
+        title={`Saturation Point: (${dataPeakMin} - ${dataPeakMax}) Data value below which opacity falls off`}
+      >
         <Row className="viewerControls">
-          <label htmlFor="dataPeak">Data Peak</label>
+          <label htmlFor="dataPeak">Saturation Point</label>
         </Row>
         <Row className="viewerControls">
           <Col span={6}>
@@ -115,8 +127,8 @@ export default function ViewerControls({
               id="dataPeak"
               name="dataPeak"
               type="number"
-              min="0"
-              max="255"
+              min={dataPeakMin}
+              max={dataPeakMax}
               step="1"
               value={peak}
               onChange={onPeakInputChange}
@@ -124,8 +136,8 @@ export default function ViewerControls({
           </Col>
           <Col span={18}>
             <Slider
-              min={0}
-              max={255}
+              min={dataPeakMin}
+              max={dataPeakMax}
               value={parseInt(peak, 10)}
               onChange={onPeakChange}
               step={1}
@@ -136,35 +148,41 @@ export default function ViewerControls({
           </Col>
         </Row>
       </Tooltip>
-      <Row className="viewerControls">
-        <label htmlFor="dataGamma">Data Gamma</label>
-      </Row>
-      <Row className="viewerControls">
-        <Col span={6}>
-          <input
-            name="dataGamma"
-            id="dataGamma"
-            type="number"
-            value={dataGamma}
-            min="0"
-            max="6"
-            step="0.01"
-            onChange={onDataGammaInputChange}
-          />
-        </Col>
-        <Col span={18}>
-          <Slider
-            min={0}
-            max={6}
-            value={parseFloat(dataGamma, 10)}
-            onChange={onDataGammaChange}
-            step={0.01}
-            railStyle={{
-              background: `linear-gradient(.25turn, #000000, ${dataColor})`,
-            }}
-          />
-        </Col>
-      </Row>
+      <Tooltip
+        placement="left"
+        color="#008b94"
+        title={`Volume Gamma: (${dataGammaMin} - ${dataGammaMax}) Smaller value gives faster opacity falloff from Saturation Point`}
+      >
+        <Row className="viewerControls">
+          <label htmlFor="dataGamma">Volume Gamma</label>
+        </Row>
+        <Row className="viewerControls">
+          <Col span={6}>
+            <input
+              name="dataGamma"
+              id="dataGamma"
+              type="number"
+              value={dataGamma}
+              min={dataGammaMin}
+              max={dataGammaMax}
+              step="0.01"
+              onChange={onDataGammaInputChange}
+            />
+          </Col>
+          <Col span={18}>
+            <Slider
+              min={dataGammaMin}
+              max={dataGammaMax}
+              value={parseFloat(dataGamma, 10)}
+              onChange={onDataGammaChange}
+              step={0.01}
+              railStyle={{
+                background: `linear-gradient(.25turn, #000000, ${dataColor})`,
+              }}
+            />
+          </Col>
+        </Row>
+      </Tooltip>
       <Row>
         <span style={{ display: "none" }}>
           <label htmlFor="sampleSpacing">Sample Spacing</label>
@@ -180,36 +198,42 @@ export default function ViewerControls({
           />
         </span>
       </Row>
-      <Row className="viewerControls">
-        <label htmlFor="finalGamma">Final Gamma</label>
-      </Row>
-      <Row className="viewerControls">
-        <Col span={6}>
-          <input
-            name="finalGamma"
-            id="finalGamma"
-            type="number"
-            value={finalGamma}
-            min="0.1"
-            max="10"
-            step="0.1"
-            onChange={onFinalGammaInputChange}
-          />
-        </Col>
-        <Col span={18}>
-          <Slider
-            min={0.1}
-            max={10}
-            value={parseFloat(finalGamma, 10)}
-            onChange={onFinalGammaChange}
-            step={0.1}
-            railStyle={{
-              background: `linear-gradient(.25turn, #000000, ${dataColor})`,
-            }}
-          />
-        </Col>
-      </Row>
-      <Divider />
+      <Tooltip
+        placement="left"
+        color="#008b94"
+        title={`Final Image Gamma: (${finalGammaMin} - ${finalGammaMax}) Larger value enhances low data values`}
+      >
+        <Row className="viewerControls">
+          <label htmlFor="finalGamma">Final Image Gamma</label>
+        </Row>
+        <Row className="viewerControls">
+          <Col span={6}>
+            <input
+              name="finalGamma"
+              id="finalGamma"
+              type="number"
+              value={finalGamma}
+              min={finalGammaMin}
+              max={finalGammaMax}
+              step="0.1"
+              onChange={onFinalGammaInputChange}
+            />
+          </Col>
+          <Col span={18}>
+            <Slider
+              min={finalGammaMin}
+              max={finalGammaMax}
+              value={parseFloat(finalGamma, 10)}
+              onChange={onFinalGammaChange}
+              step={0.1}
+              railStyle={{
+                background: `linear-gradient(.25turn, #000000, ${dataColor})`,
+              }}
+            />
+          </Col>
+        </Row>
+      </Tooltip>
+      <hr className="controlsDivider" />
       <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="surfaceColor">
@@ -232,28 +256,30 @@ export default function ViewerControls({
             ghost
             onClick={handleSurfaceToggle}
           >
-            Toggle
+            {useSurface ? "Hide" : "Show"}
           </Button>
         </Col>
       </Row>
-      <Divider />
-      <Row className="viewerControls">
-        <label htmlFor="speedUp">Speed Up</label>
-      </Row>
-      <Row className="viewerControls">
-        <input
-          name="speedUp"
-          id="speedUp"
-          type="number"
-          value={speedUp}
-          min="1"
-          max="20"
-          step="1"
-          onChange={(event) =>
-            onSpeedUpChange(parseInt(event.target.value, 10))
-          }
-        />
-      </Row>
+      <hr className="controlsDivider" />
+      <Tooltip placement="left" color="#008b94" title="Speed Up">
+        <Row className="viewerControls">
+          <label htmlFor="speedUp">Speed Up</label>
+        </Row>
+        <Row className="viewerControls">
+          <input
+            name="speedUp"
+            id="speedUp"
+            type="number"
+            value={speedUp}
+            min="1"
+            max="20"
+            step="1"
+            onChange={(event) =>
+              onSpeedUpChange(parseInt(event.target.value, 10))
+            }
+          />
+        </Row>
+      </Tooltip>
     </>
   );
 }
