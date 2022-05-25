@@ -20,3 +20,15 @@
 .viewerControls button {
   margin-right: 1em;
 }
+/*
+.ant-slider-rail {
+  background: linear-gradient(.25turn, #ff00ff, #000000);
+}
+*/
+.ant-slider-track {
+  background: none;
+}
+
+.ant-slider:hover .ant-slider-track {
+  background: none;
+}

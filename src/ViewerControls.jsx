@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import useEventListener from "@use-it/event-listener";
 import "./ViewerControls.css";
-import { Tooltip } from "antd";
+import { Tooltip, Slider } from "antd";
 
 export default function ViewerControls({
   onFinalGammaChange,
@@ -16,12 +16,25 @@ export default function ViewerControls({
   useLighting,
   onSpeedUpChange,
   speedUp,
+  dataColor,
 }) {
   useEventListener("keydown", ({ key }) => {
     if (key === "l") {
       setUseLighting(!useLighting);
     }
   });
+
+  const onPeakInputChange = (event) => {
+    onPeakChange(event.target.valueAsNumber);
+  };
+
+  const onDataGammaInputChange = (event) => {
+    onDataGammaChange(event.target.valueAsNumber);
+  };
+
+  const onFinalGammaInputChange = (event) => {
+    onFinalGammaChange(event.target.valueAsNumber);
+  };
 
   return (
     <div className="viewerControls">
@@ -35,9 +48,20 @@ export default function ViewerControls({
           max="255"
           step="1"
           value={peak}
+          onChange={onPeakInputChange}
+        />
+        <Slider
+          min={0}
+          max={255}
+          value={parseInt(peak, 10)}
           onChange={onPeakChange}
+          step={1}
+          railStyle={{
+            background: `linear-gradient(.25turn, ${dataColor}, #000000)`,
+          }}
         />
       </Tooltip>
+
       <label htmlFor="dataGamma">Data Gamma</label>
       <input
         name="dataGamma"
@@ -47,8 +71,19 @@ export default function ViewerControls({
         min="0"
         max="6"
         step="0.01"
-        onChange={onDataGammaChange}
+        onChange={onDataGammaInputChange}
       />
+      <Slider
+        min={0}
+        max={6}
+        value={parseFloat(dataGamma, 10)}
+        onChange={onDataGammaChange}
+        step={0.01}
+        railStyle={{
+          background: `linear-gradient(.25turn, #000000, ${dataColor})`,
+        }}
+      />
+
       <span style={{ display: "none" }}>
         <label htmlFor="sampleSpacing">Sample Spacing</label>
         <input
@@ -62,6 +97,7 @@ export default function ViewerControls({
           onChange={onDtScaleChange}
         />
       </span>
+
       <label htmlFor="finalGamma">Final Gamma</label>
       <input
         name="finalGamma"
@@ -69,10 +105,21 @@ export default function ViewerControls({
         type="number"
         value={finalGamma}
         min="0.1"
-        max="1000"
+        max="10"
         step="0.1"
-        onChange={onFinalGammaChange}
+        onChange={onFinalGammaInputChange}
       />
+      <Slider
+        min={0.1}
+        max={10}
+        value={parseFloat(finalGamma, 10)}
+        onChange={onFinalGammaChange}
+        step={0.1}
+        railStyle={{
+          background: `linear-gradient(.25turn, #000000, ${dataColor})`,
+        }}
+      />
+
       <label htmlFor="speedUp">Speed Up</label>
       <input
         name="speedUp"
@@ -101,4 +148,5 @@ ViewerControls.propTypes = {
   useLighting: PropTypes.bool.isRequired,
   onSpeedUpChange: PropTypes.func.isRequired,
   speedUp: PropTypes.number.isRequired,
+  dataColor: PropTypes.string.isRequired,
 };

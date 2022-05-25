@@ -142,22 +142,22 @@ export default function VolumeDataLoader() {
     );
   };
 
-  const onFinalGammaChange = (event) => {
+  const onFinalGammaChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setFinalGamma(event.target.valueAsNumber);
-      updateSearchParameters({ name: "fg", value: event.target.valueAsNumber });
+      setFinalGamma(value);
+      updateSearchParameters({ name: "fg", value });
     }
   };
 
-  const onPeakChange = (event) => {
+  const onPeakChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setPeak(event.target.valueAsNumber);
-      updateSearchParameters({ name: "dp", value: event.target.valueAsNumber });
+      setPeak(value);
+      updateSearchParameters({ name: "dp", value });
       transferFunctionTexRef.current = makeFluoTransferTex(
         alpha0,
-        event.target.valueAsNumber,
+        value,
         dataGamma,
         alpha1,
         dataColor
@@ -165,15 +165,15 @@ export default function VolumeDataLoader() {
     }
   };
 
-  const onDataGammaChange = (event) => {
+  const onDataGammaChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setDataGamma(event.target.valueAsNumber);
-      updateSearchParameters({ name: "dg", value: event.target.valueAsNumber });
+      setDataGamma(value);
+      updateSearchParameters({ name: "dg", value });
       transferFunctionTexRef.current = makeFluoTransferTex(
         alpha0,
         peak,
-        event.target.valueAsNumber,
+        value,
         alpha1,
         dataColor
       );
@@ -340,6 +340,7 @@ export default function VolumeDataLoader() {
           onDataGammaChange={onDataGammaChange}
           dataGamma={dataGamma}
           dtScale={dtScale}
+          dataColor={dataColor}
           onDtScaleChange={onDtScaleChange}
           useLighting={useLighting}
           setUseLighting={setUseLighting}
