@@ -30,6 +30,23 @@ const peakDefault = 217;
 const dataGammaDefault = 0.5;
 const defaultSpeedUp = 2;
 
+function getCameraPosition(searchParams) {
+  let defaultPosition = [0, 0, -1];
+
+  if (
+    searchParams.get("cx") &&
+    searchParams.get("cy") &&
+    searchParams.get("cz")
+  ) {
+    defaultPosition = [
+      parseFloat(searchParams.get("cx"), 10),
+      parseFloat(searchParams.get("cy"), 10),
+      parseFloat(searchParams.get("cz"), 10),
+    ];
+  }
+  return defaultPosition;
+}
+
 export default function VolumeDataLoader() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [h5jUrl, setH5jUrl] = React.useState(null);
@@ -83,25 +100,14 @@ export default function VolumeDataLoader() {
   );
 
   React.useEffect(() => {
-    let defaultPosition = [0, 0, -1];
-
-    // only set the inital position once when the component loads from scratch.
-    // after that we let the VolViewer handle the camera position.
+    // only set the initial position once when the component loads
+    // from scratch. After that we let the VolViewer handle the
+    // camera position.
     if (!initialCameraPosition) {
-      if (
-        searchParams.get("cx") &&
-        searchParams.get("cy") &&
-        searchParams.get("cz")
-      ) {
-        defaultPosition = [
-          parseFloat(searchParams.get("cx"), 10),
-          parseFloat(searchParams.get("cy"), 10),
-          parseFloat(searchParams.get("cz"), 10),
-        ];
-      }
-      setInitialCameraPosition(defaultPosition);
+      const cameraPosition = getCameraPosition(searchParams);
+      setInitialCameraPosition(cameraPosition);
     }
-  }, [initialCameraPosition, searchParams]);
+  }, [initialCameraPosition, searchParams, showControls]);
 
   React.useEffect(() => {
     let defaultUp = [0, -1, 0];
@@ -225,6 +231,14 @@ export default function VolumeDataLoader() {
     // processed until the WebGL rendering triggered by the last event has been processed.
     allowThrottledEvent.current = true;
   }, []);
+
+  const handleShowControl = (value) => {
+    setShowControls(value);
+    // we have to trigger a resize event after the controls have been hidden to force
+    // the web-vol-viewer code to re-render the scene. If we don't do this, the scene
+    // will not update to fill the new space, until someone clicks on it.
+    window.dispatchEvent(new Event("resize"));
+  };
 
   const h5jParam = searchParams.get("h5j");
   const swcParam = searchParams.get("swc");
@@ -379,14 +393,19 @@ export default function VolumeDataLoader() {
               surfaceColor={surfaceColor}
               setSurfaceColor={setSurfaceColor}
               mirroredX={mirroredX}
-              setShowControls={setShowControls}
+              setShowControls={handleShowControl}
               onMirrorChange={setMirroredX}
               alphaScale={alphaScale}
               onAlphaChange={onAlphaScaleChange}
             />
           </Col>
         ) : (
-          <Button className="showButton" onClick={() => setShowControls(true)}>
+          <Button
+            className="showButton"
+            ghost
+            size="small"
+            onClick={() => handleShowControl(true)}
+          >
             Controls
           </Button>
         )}
