@@ -87,7 +87,11 @@ export default function ViewerControls({
 
   return (
     <>
-      <Row onClick={() => setShowControls(false)}>Close</Row>
+      <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
+        <Button ghost size="small" onClick={() => setShowControls(false)}>
+          Close
+        </Button>
+      </Row>
       <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="dataColor">
@@ -313,18 +317,20 @@ export default function ViewerControls({
         </Tooltip>
       </Row>
       <Row className="viewerControls">
-        <input
-          name="speedUp"
-          id="speedUp"
-          type="number"
-          value={speedUp}
-          min="1"
-          max="20"
-          step="1"
-          onChange={(event) =>
-            onSpeedUpChange(parseInt(event.target.value, 10))
-          }
-        />
+        <Col span={6}>
+          <input
+            name="speedUp"
+            id="speedUp"
+            type="number"
+            value={speedUp}
+            min="1"
+            max="20"
+            step="1"
+            onChange={(event) =>
+              onSpeedUpChange(parseInt(event.target.value, 10))
+            }
+          />
+        </Col>
       </Row>
     </>
   );
