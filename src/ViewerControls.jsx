@@ -35,6 +35,7 @@ export default function ViewerControls({
   mirroredX,
   onMirrorChange,
   onDataColorChange,
+  setShowControls,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const swcUrl = searchParams.get("swc");
@@ -81,6 +82,7 @@ export default function ViewerControls({
 
   return (
     <>
+      <Row onClick={() => setShowControls(false)}>Close</Row>
       <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="dataColor">
@@ -305,4 +307,5 @@ ViewerControls.propTypes = {
   onDataColorChange: PropTypes.func.isRequired,
   mirroredX: PropTypes.bool.isRequired,
   onMirrorChange: PropTypes.func.isRequired,
+  setShowControls: PropTypes.func.isRequired,
 };

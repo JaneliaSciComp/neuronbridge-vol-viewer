@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Row, Col } from "antd";
+import { Row, Col, Button } from "antd";
 import {
   getH5JAttrs,
   openH5J,
@@ -65,6 +65,7 @@ export default function VolumeDataLoader() {
   const [mirroredX, setMirroredX] = React.useState(
     Boolean(searchParams.get("mx")) || false
   );
+  const [showControls, setShowControls] = React.useState(true);
 
   const [initialCameraPosition, setInitialCameraPosition] =
     React.useState(null);
@@ -322,7 +323,7 @@ export default function VolumeDataLoader() {
   if (dataUint8) {
     return (
       <Row style={{ height: "100%" }}>
-        <Col span={16}>
+        <Col span={showControls ? 16 : 24}>
           <Vol3dViewer
             volumeDataUint8={dataUint8}
             volumeSize={volumeSize}
@@ -343,30 +344,37 @@ export default function VolumeDataLoader() {
             interactionSpeedup={speedUp}
           />
         </Col>
-        <Col span={8}>
-          <ViewerControls
-            onFinalGammaChange={onFinalGammaChange}
-            finalGamma={finalGamma}
-            peak={peak}
-            onPeakChange={onPeakChange}
-            onDataGammaChange={onDataGammaChange}
-            dataGamma={dataGamma}
-            dtScale={dtScale}
-            onDtScaleChange={onDtScaleChange}
-            useLighting={useLighting}
-            setUseLighting={setUseLighting}
-            onSpeedUpChange={setSpeedUp}
-            speedUp={speedUp}
-            dataColor={dataColor}
-            onDataColorChange={onDataColorInputChange}
-            useSurface={useSurface}
-            onSurfaceHide={setUseSurface}
-            surfaceColor={surfaceColor}
-            setSurfaceColor={setSurfaceColor}
-            mirroredX={mirroredX}
-            onMirrorChange={setMirroredX}
-          />
-        </Col>
+        {showControls ? (
+          <Col span={8}>
+            <ViewerControls
+              onFinalGammaChange={onFinalGammaChange}
+              finalGamma={finalGamma}
+              peak={peak}
+              onPeakChange={onPeakChange}
+              onDataGammaChange={onDataGammaChange}
+              dataGamma={dataGamma}
+              dtScale={dtScale}
+              onDtScaleChange={onDtScaleChange}
+              useLighting={useLighting}
+              setUseLighting={setUseLighting}
+              onSpeedUpChange={setSpeedUp}
+              speedUp={speedUp}
+              dataColor={dataColor}
+              onDataColorChange={onDataColorInputChange}
+              useSurface={useSurface}
+              onSurfaceHide={setUseSurface}
+              surfaceColor={surfaceColor}
+              setSurfaceColor={setSurfaceColor}
+              mirroredX={mirroredX}
+              setShowControls={setShowControls}
+              onMirrorChange={setMirroredX}
+            />
+          </Col>
+        ) : (
+          <Button className="showButton" onClick={() => setShowControls(true)}>
+            Controls
+          </Button>
+        )}
       </Row>
     );
   }
