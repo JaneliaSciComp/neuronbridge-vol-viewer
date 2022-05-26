@@ -130,7 +130,14 @@ export default function VolumeDataLoader() {
     }
   }, [initialCameraUp, searchParams]);
 
-  const updateSearchParameters = React.useCallback((newParameters) => {
+  /* There is a security feature in safari that prevents an application from
+   * using the history.pushState() function more than 100 times in 30
+   * seconds. If that trigger is reached, the page reloads and messes up our
+   * rendering. Adding a debounce drastically reduces the number of times the
+   * u*l is updated if a slider is "wiggled". The best place to add the
+   * debounce was to the updateSearchParameters function.
+   */
+  const updateSearchParameters = useDebouncedCallback((newParameters) => {
     let updatedSearchParams = new URLSearchParams(searchParams.toString());
     if (!Array.isArray(newParameters)) {
       newParameters = [newParameters];
@@ -139,7 +146,7 @@ export default function VolumeDataLoader() {
       updatedSearchParams.set(newParam.name, newParam.value);
     });
     setSearchParams(updatedSearchParams.toString());
-  }, []);
+  }, 500);
 
   const onDataColorInputChange = (event) => {
     setDataColor(event.target.value);
