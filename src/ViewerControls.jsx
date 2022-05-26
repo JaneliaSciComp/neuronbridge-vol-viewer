@@ -13,6 +13,8 @@ const dataGammaMin = 0;
 const dataGammaMax = 1.5;
 const finalGammaMin = 0.1;
 const finalGammaMax = 10;
+const alphaScaleMin = 0;
+const alphaScaleMax = 1;
 
 export default function ViewerControls({
   onFinalGammaChange,
@@ -36,6 +38,8 @@ export default function ViewerControls({
   onMirrorChange,
   onDataColorChange,
   setShowControls,
+  alphaScale,
+  onAlphaChange,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const swcUrl = searchParams.get("swc");
@@ -263,6 +267,40 @@ export default function ViewerControls({
         </Col>
       </Row>
       <hr className="controlsDivider" />
+      <Tooltip placement="left" color="#008b94" title="Alpha Scale">
+        <Row className="viewerControls">
+          <label htmlFor="alphaScale">Alpha Scale</label>
+        </Row>
+        <Row className="viewerControls">
+          <Col span={6}>
+            <input
+              name="alphaScale"
+              id="alphaScale"
+              type="number"
+              value={alphaScale}
+              min={alphaScaleMin}
+              max={alphaScaleMax}
+              step="0.1"
+              onChange={(event) =>
+                onAlphaChange(parseFloat(event.target.value, 10))
+              }
+            />
+          </Col>
+          <Col span={18}>
+            <Slider
+              min={alphaScaleMin}
+              max={alphaScaleMax}
+              value={parseFloat(alphaScale, 10)}
+              onChange={onAlphaChange}
+              step={0.1}
+              railStyle={{
+                background: `linear-gradient(.25turn, #000000, #ffffff)`,
+              }}
+            />
+          </Col>
+        </Row>
+      </Tooltip>
+
       <Tooltip placement="left" color="#008b94" title="Speed Up">
         <Row className="viewerControls">
           <label htmlFor="speedUp">Speed Up</label>
@@ -308,4 +346,6 @@ ViewerControls.propTypes = {
   mirroredX: PropTypes.bool.isRequired,
   onMirrorChange: PropTypes.func.isRequired,
   setShowControls: PropTypes.func.isRequired,
+  alphaScale: PropTypes.number.isRequired,
+  onAlphaChange: PropTypes.func.isRequired,
 };

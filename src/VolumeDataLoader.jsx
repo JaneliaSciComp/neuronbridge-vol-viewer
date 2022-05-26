@@ -72,6 +72,10 @@ export default function VolumeDataLoader() {
 
   const [initialCameraUp, setInitialCameraUp] = React.useState(null);
 
+  const [alphaScale, setAlphaScale] = React.useState(
+    searchParams.get("as") || 1.0
+  );
+
   const allowThrottledEvent = React.useRef(false);
 
   const transferFunctionTexRef = React.useRef(
@@ -148,6 +152,14 @@ export default function VolumeDataLoader() {
       allowThrottledEvent.current = false;
       setFinalGamma(value);
       updateSearchParameters({ name: "fg", value });
+    }
+  };
+
+  const onAlphaScaleChange = (value) => {
+    if (allowThrottledEvent.current) {
+      allowThrottledEvent.current = false;
+      setAlphaScale(value);
+      updateSearchParameters({ name: "as", value });
     }
   };
 
@@ -334,6 +346,7 @@ export default function VolumeDataLoader() {
             useLighting={useLighting}
             useSurface={useSurface}
             surfaceMesh={swcSurfaceMesh}
+            alphaScale={alphaScale}
             surfaceColor={surfaceColor}
             dataColor={dataColor}
             onWebGLRender={onWebGLRender}
@@ -368,6 +381,8 @@ export default function VolumeDataLoader() {
               mirroredX={mirroredX}
               setShowControls={setShowControls}
               onMirrorChange={setMirroredX}
+              alphaScale={alphaScale}
+              onAlphaChange={onAlphaScaleChange}
             />
           </Col>
         ) : (
