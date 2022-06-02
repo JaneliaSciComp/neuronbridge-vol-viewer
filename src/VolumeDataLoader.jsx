@@ -54,11 +54,20 @@ const defaultState = {
   dataGamma: parseFloat(initialParams.get("dg"), 10) || dataGammaDefault,
   surfaceColor: initialParams.get("sc") || "#00ff00",
   dataColor: initialParams.get("dc") || "#ff00ff",
-  finalGamma: initialParams.get("fg") || Vol3dViewer.defaultProps.finalGamma,
-  alphaScale: initialParams.get("as") || 1.0,
-  peak: initialParams.get("dp") || peakDefault,
+  finalGamma: parseInt(
+    initialParams.get("fg") || Vol3dViewer.defaultProps.finalGamma,
+    10
+  ),
+  alphaScale: parseFloat(initialParams.get("as") || 1.0),
+  peak: parseInt(initialParams.get("dp") || peakDefault, 10),
   mirroredX: Boolean(initialParams.get("mx")) || false,
   speedUp: defaultSpeedUp,
+  cameraUp: [
+    parseFloat(initialParams.get("upx") || 0),
+    parseFloat(initialParams.get("upy") || -1),
+    parseFloat(initialParams.get("upz") || 0),
+  ],
+  cameraPosition: getCameraPosition(initialParams),
 };
 
 function parameterReducer(state, action) {
@@ -91,11 +100,7 @@ export default function VolumeDataLoader() {
   const [useSurface, setUseSurface] = React.useState(false);
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
   const [showControls, setShowControls] = React.useState(true);
-
-  const [initialCameraPosition, setInitialCameraPosition] =
-    React.useState(null);
-
-  const [initialCameraUp, setInitialCameraUp] = React.useState(null);
+  const [forceUpdate, setForceUpdate] = React.useState(0);
 
   const allowThrottledEvent = React.useRef(false);
 
@@ -112,12 +117,12 @@ export default function VolumeDataLoader() {
   const onReset = () => {
     dispatch({ type: "reset" });
     let updatedSearchParams = new URLSearchParams(searchParams.toString());
-    /* updatedSearchParams.delete("upx");
-    updatedSearchParams.delete("upy");
-    updatedSearchParams.delete("upz");
-    updatedSearchParams.delete("cx");
-    updatedSearchParams.delete("cy");
-    updatedSearchParams.delete("cz");*/
+    updatedSearchParams.set("upx", defaultState.cameraUp[0]);
+    updatedSearchParams.set("upy", defaultState.cameraUp[1]);
+    updatedSearchParams.set("upz", defaultState.cameraUp[2]);
+    updatedSearchParams.set("cx", defaultState.cameraPosition[0]);
+    updatedSearchParams.set("cy", defaultState.cameraPosition[1]);
+    updatedSearchParams.set("cz", defaultState.cameraPosition[2]);
     // data peak
     updatedSearchParams.set("dp", defaultState.peak);
     // colors
@@ -130,6 +135,8 @@ export default function VolumeDataLoader() {
     updatedSearchParams.set("as", defaultState.alphaScale);
     // mirroring
     updatedSearchParams.set("mx", defaultState.mirroredX);
+
+    setForceUpdate((count) => count + 1);
 
     setSearchParams(updatedSearchParams.toString());
   };
@@ -145,37 +152,6 @@ export default function VolumeDataLoader() {
       )
     );
   }, [paramState.peak, paramState.dataGamma, paramState.dataColor]);
-
-  React.useEffect(() => {
-    // only set the initial position once when the component loads
-    // from scratch. After that we let the VolViewer handle the
-    // camera position.
-    if (!initialCameraPosition) {
-      const cameraPosition = getCameraPosition(searchParams);
-      setInitialCameraPosition(cameraPosition);
-    }
-  }, [initialCameraPosition, searchParams]);
-
-  React.useEffect(() => {
-    let defaultUp = [0, -1, 0];
-
-    // only set the inital position once when the component loads from scratch.
-    // after that we let the VolViewer handle the camera position.
-    if (!initialCameraUp) {
-      if (
-        searchParams.get("upx") &&
-        searchParams.get("upy") &&
-        searchParams.get("upz")
-      ) {
-        defaultUp = [
-          parseFloat(searchParams.get("upx"), 10),
-          parseFloat(searchParams.get("upy"), 10),
-          parseFloat(searchParams.get("upz"), 10),
-        ];
-      }
-      setInitialCameraUp(defaultUp);
-    }
-  }, [initialCameraUp, searchParams]);
 
   /* There is a security feature in safari that prevents an application from
    * using the history.pushState() function more than 100 times in 30
@@ -434,6 +410,7 @@ export default function VolumeDataLoader() {
       <Row style={{ height: "100%" }}>
         <Col span={showControls ? 16 : 24}>
           <Vol3dViewer
+            key={forceUpdate}
             volumeDataUint8={dataUint8}
             volumeSize={volumeSize}
             voxelSize={voxelSize}
@@ -449,8 +426,8 @@ export default function VolumeDataLoader() {
             onWebGLRender={onWebGLRender}
             onCameraChange={onCameraChange}
             useVolumeMirrorX={paramState.mirroredX}
-            cameraPosition={initialCameraPosition}
-            cameraUp={initialCameraUp}
+            cameraPosition={paramState.cameraPosition}
+            cameraUp={paramState.cameraUp}
             interactionSpeedup={paramState.speedUp}
           />
         </Col>
