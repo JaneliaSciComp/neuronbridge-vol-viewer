@@ -47,6 +47,30 @@ function getCameraPosition(searchParams) {
   return defaultPosition;
 }
 
+const initialParams = new URLSearchParams(window.location.search);
+const defaultState = {
+  dtScale:
+    parseFloat(initialParams.get("ds"), 10) || Vol3dViewer.defaultProps.dtScale,
+  dataGamma: parseFloat(initialParams.get("dg"), 10) || dataGammaDefault,
+  surfaceColor: initialParams.get("sc") || "#00ff00",
+  dataColor: initialParams.get("dc") || "#ff00ff",
+  finalGamma: initialParams.get("fg") || Vol3dViewer.defaultProps.finalGamma,
+  alphaScale: initialParams.get("as") || 1.0,
+  peak: initialParams.get("dp") || peakDefault,
+  mirroredX: Boolean(initialParams.get("mx")) || false,
+  speedUp: defaultSpeedUp,
+};
+
+function parameterReducer(state, action) {
+  if (action.type === "update") {
+    const updatedState = { ...state, [action.parameter]: action.value };
+    return updatedState;
+  } else if (action.type === "reset") {
+    return defaultState;
+  }
+  throw Error("Unknown action");
+}
+
 export default function VolumeDataLoader() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [h5jUrl, setH5jUrl] = React.useState(null);
@@ -57,31 +81,15 @@ export default function VolumeDataLoader() {
   const [voxelSize, setVoxelSize] = React.useState(null);
   const [units, setUnits] = React.useState("");
   const [dataUint8, setDataUint8] = React.useState(null);
-  const [dtScale, setDtScale] = React.useState(
-    parseFloat(searchParams.get("ds"), 10) || Vol3dViewer.defaultProps.dtScale
-  );
-  const [peak, setPeak] = React.useState(searchParams.get("dp") || peakDefault);
-  const [dataGamma, setDataGamma] = React.useState(
-    searchParams.get("dg") || dataGammaDefault
-  );
-  const [finalGamma, setFinalGamma] = React.useState(
-    searchParams.get("fg") || Vol3dViewer.defaultProps.finalGamma
+  const [paramState, dispatch] = React.useReducer(
+    parameterReducer,
+    defaultState
   );
   const [loadingPercent, setLoadingPercent] = React.useState(0);
   const [h5jLoadingError, setH5jLoadingError] = React.useState(null);
   const [useLighting, setUseLighting] = React.useState(true);
   const [useSurface, setUseSurface] = React.useState(false);
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
-  const [speedUp, setSpeedUp] = React.useState(defaultSpeedUp);
-  const [surfaceColor, setSurfaceColor] = React.useState(
-    searchParams.get("sc") || "#00ff00"
-  );
-  const [dataColor, setDataColor] = React.useState(
-    searchParams.get("dc") || "#ff00ff"
-  );
-  const [mirroredX, setMirroredX] = React.useState(
-    Boolean(searchParams.get("mx")) || false
-  );
   const [showControls, setShowControls] = React.useState(true);
 
   const [initialCameraPosition, setInitialCameraPosition] =
@@ -89,15 +97,54 @@ export default function VolumeDataLoader() {
 
   const [initialCameraUp, setInitialCameraUp] = React.useState(null);
 
-  const [alphaScale, setAlphaScale] = React.useState(
-    searchParams.get("as") || 1.0
-  );
-
   const allowThrottledEvent = React.useRef(false);
 
-  const transferFunctionTexRef = React.useRef(
-    makeFluoTransferTex(alpha0, peak, dataGamma, alpha1, dataColor)
+  const [transferFunctionTex, setTransferFuncTex] = React.useState(
+    makeFluoTransferTex(
+      alpha0,
+      paramState.peak,
+      paramState.dataGamma,
+      alpha1,
+      paramState.dataColor
+    )
   );
+
+  const onReset = () => {
+    dispatch({ type: "reset" });
+    let updatedSearchParams = new URLSearchParams(searchParams.toString());
+    /* updatedSearchParams.delete("upx");
+    updatedSearchParams.delete("upy");
+    updatedSearchParams.delete("upz");
+    updatedSearchParams.delete("cx");
+    updatedSearchParams.delete("cy");
+    updatedSearchParams.delete("cz");*/
+    // data peak
+    updatedSearchParams.set("dp", defaultState.peak);
+    // colors
+    updatedSearchParams.set("sc", defaultState.surfaceColor);
+    updatedSearchParams.set("dc", defaultState.dataColor);
+    // gamma
+    updatedSearchParams.set("dg", defaultState.dataGamma);
+    updatedSearchParams.set("fg", defaultState.finalGamma);
+    // alpha scale
+    updatedSearchParams.set("as", defaultState.alphaScale);
+    // mirroring
+    updatedSearchParams.set("mx", defaultState.mirroredX);
+
+    setSearchParams(updatedSearchParams.toString());
+  };
+
+  React.useEffect(() => {
+    setTransferFuncTex(
+      makeFluoTransferTex(
+        alpha0,
+        paramState.peak,
+        paramState.dataGamma,
+        alpha1,
+        paramState.dataColor
+      )
+    );
+  }, [paramState.peak, paramState.dataGamma, paramState.dataColor]);
 
   React.useEffect(() => {
     // only set the initial position once when the component loads
@@ -107,7 +154,7 @@ export default function VolumeDataLoader() {
       const cameraPosition = getCameraPosition(searchParams);
       setInitialCameraPosition(cameraPosition);
     }
-  }, [initialCameraPosition, searchParams, showControls]);
+  }, [initialCameraPosition, searchParams]);
 
   React.useEffect(() => {
     let defaultUp = [0, -1, 0];
@@ -134,7 +181,7 @@ export default function VolumeDataLoader() {
    * using the history.pushState() function more than 100 times in 30
    * seconds. If that trigger is reached, the page reloads and messes up our
    * rendering. Adding a debounce drastically reduces the number of times the
-   * u*l is updated if a slider is "wiggled". The best place to add the
+   * url is updated if a slider is "wiggled". The best place to add the
    * debounce was to the updateSearchParameters function.
    */
   const updateSearchParameters = useDebouncedCallback((newParameters) => {
@@ -149,21 +196,22 @@ export default function VolumeDataLoader() {
   }, 500);
 
   const onDataColorInputChange = (event) => {
-    setDataColor(event.target.value);
+    dispatch({
+      type: "update",
+      value: event.target.value,
+      parameter: "dataColor",
+    });
     updateSearchParameters({ name: "dc", value: event.target.value });
-    transferFunctionTexRef.current = makeFluoTransferTex(
-      alpha0,
-      peak,
-      dataGamma,
-      alpha1,
-      event.target.value
-    );
   };
 
   const onFinalGammaChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setFinalGamma(value);
+      dispatch({
+        type: "update",
+        value,
+        parameter: "finalGamma",
+      });
       updateSearchParameters({ name: "fg", value });
     }
   };
@@ -171,7 +219,11 @@ export default function VolumeDataLoader() {
   const onAlphaScaleChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setAlphaScale(value);
+      dispatch({
+        type: "update",
+        value,
+        parameter: "alphaScale",
+      });
       updateSearchParameters({ name: "as", value });
     }
   };
@@ -179,39 +231,63 @@ export default function VolumeDataLoader() {
   const onPeakChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setPeak(value);
-      updateSearchParameters({ name: "dp", value });
-      transferFunctionTexRef.current = makeFluoTransferTex(
-        alpha0,
+      dispatch({
+        type: "update",
         value,
-        dataGamma,
-        alpha1,
-        dataColor
-      );
+        parameter: "peak",
+      });
+
+      updateSearchParameters({ name: "dp", value });
     }
   };
 
   const onDataGammaChange = (value) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setDataGamma(value);
-      updateSearchParameters({ name: "dg", value });
-      transferFunctionTexRef.current = makeFluoTransferTex(
-        alpha0,
-        peak,
+      dispatch({
+        type: "update",
         value,
-        alpha1,
-        dataColor
-      );
+        parameter: "dataGamma",
+      });
+      updateSearchParameters({ name: "dg", value });
     }
   };
 
   const onDtScaleChange = (event) => {
     if (allowThrottledEvent.current) {
       allowThrottledEvent.current = false;
-      setDtScale(event.target.valueAsNumber);
+      dispatch({
+        type: "update",
+        value: event.target.valueAsNumber,
+        parameter: "dtScale",
+      });
       updateSearchParameters({ name: "ds", value: event.target.valueAsNumber });
     }
+  };
+
+  const setMirroredX = (value) => {
+    dispatch({
+      type: "update",
+      value,
+      parameter: "mirroredX",
+    });
+    updateSearchParameters({ name: "mx", value });
+  };
+
+  const setSpeedUp = (value) => {
+    dispatch({
+      type: "update",
+      value,
+      parameter: "speedUp",
+    });
+  };
+
+  const setSurfaceColor = (value) => {
+    dispatch({
+      type: "update",
+      value,
+      parameter: "surfaceColor",
+    });
   };
 
   const onCameraChange = useDebouncedCallback((event) => {
@@ -317,7 +393,7 @@ export default function VolumeDataLoader() {
     async function loadSwcData(swcUrl) {
       const text = await textFromFileOrURL(swcUrl);
       const json = parseSwc(text);
-      const mesh = makeSwcSurface(json, surfaceColor);
+      const mesh = makeSwcSurface(json, paramState.surfaceColor);
       const { surfaceScale, surfaceTranslation } = surfaceAlignmentFactors(
         units,
         volumeSize,
@@ -338,7 +414,7 @@ export default function VolumeDataLoader() {
     if (swcUrl) {
       loadSwcData(swcUrl);
     }
-  }, [swcUrl, surfaceColor, units, voxelSize, volumeSize]);
+  }, [swcUrl, paramState.surfaceColor, units, voxelSize, volumeSize]);
 
   if (h5jLoadingError) {
     let errorMessage = `Error Loading the volume data: ${h5jLoadingError}`;
@@ -361,49 +437,50 @@ export default function VolumeDataLoader() {
             volumeDataUint8={dataUint8}
             volumeSize={volumeSize}
             voxelSize={voxelSize}
-            dtScale={dtScale}
-            transferFunctionTex={transferFunctionTexRef.current}
-            finalGamma={finalGamma}
+            dtScale={paramState.dtScale}
+            transferFunctionTex={transferFunctionTex}
+            finalGamma={paramState.finalGamma}
             useLighting={useLighting}
             useSurface={useSurface}
             surfaceMesh={swcSurfaceMesh}
-            alphaScale={alphaScale}
-            surfaceColor={surfaceColor}
-            dataColor={dataColor}
+            alphaScale={paramState.alphaScale}
+            surfaceColor={paramState.surfaceColor}
+            dataColor={paramState.dataColor}
             onWebGLRender={onWebGLRender}
             onCameraChange={onCameraChange}
-            useVolumeMirrorX={mirroredX}
+            useVolumeMirrorX={paramState.mirroredX}
             cameraPosition={initialCameraPosition}
             cameraUp={initialCameraUp}
-            interactionSpeedup={speedUp}
+            interactionSpeedup={paramState.speedUp}
           />
         </Col>
         {showControls ? (
           <Col span={8}>
             <ViewerControls
               onFinalGammaChange={onFinalGammaChange}
-              finalGamma={finalGamma}
-              peak={peak}
+              finalGamma={paramState.finalGamma}
+              peak={paramState.peak}
               onPeakChange={onPeakChange}
               onDataGammaChange={onDataGammaChange}
-              dataGamma={dataGamma}
-              dtScale={dtScale}
+              dataGamma={paramState.dataGamma}
+              dtScale={paramState.dtScale}
               onDtScaleChange={onDtScaleChange}
               useLighting={useLighting}
               setUseLighting={setUseLighting}
               onSpeedUpChange={setSpeedUp}
-              speedUp={speedUp}
-              dataColor={dataColor}
+              speedUp={paramState.speedUp}
+              dataColor={paramState.dataColor}
               onDataColorChange={onDataColorInputChange}
               useSurface={useSurface}
               onSurfaceHide={setUseSurface}
-              surfaceColor={surfaceColor}
+              surfaceColor={paramState.surfaceColor}
               setSurfaceColor={setSurfaceColor}
-              mirroredX={mirroredX}
+              mirroredX={paramState.mirroredX}
               setShowControls={handleShowControl}
               onMirrorChange={setMirroredX}
-              alphaScale={alphaScale}
+              alphaScale={paramState.alphaScale}
               onAlphaChange={onAlphaScaleChange}
+              onReset={onReset}
             />
           </Col>
         ) : (

@@ -41,6 +41,7 @@ export default function ViewerControls({
   setShowControls,
   alphaScale,
   onAlphaChange,
+  onReset,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const swcUrl = searchParams.get("swc");
@@ -88,7 +89,12 @@ export default function ViewerControls({
   return (
     <>
       <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
-        <Button ghost size="small" onClick={() => setShowControls(false)}>
+        <Button
+          type="primary"
+          ghost
+          size="small"
+          onClick={() => setShowControls(false)}
+        >
           Close
         </Button>
       </Row>
@@ -332,6 +338,11 @@ export default function ViewerControls({
           />
         </Col>
       </Row>
+      <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
+        <Button type="primary" size="small" ghost onClick={onReset}>
+          Reset
+        </Button>
+      </Row>
     </>
   );
 }
@@ -360,4 +371,5 @@ ViewerControls.propTypes = {
   setShowControls: PropTypes.func.isRequired,
   alphaScale: PropTypes.number.isRequired,
   onAlphaChange: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
 };
