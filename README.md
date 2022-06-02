@@ -4,7 +4,7 @@ Website incorporating @janelia/web-vol-viewer for direct volume rendering of neu
 ## Development
 ```
 npm install
-npm run start
+HTTPS=true npm run start
 ```
 ## Deployment
 ```
