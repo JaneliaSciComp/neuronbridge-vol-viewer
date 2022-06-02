@@ -49,14 +49,14 @@ function getCameraPosition(searchParams) {
 
 const initialParams = new URLSearchParams(window.location.search);
 const defaultState = {
-  dtScale:
-    parseFloat(initialParams.get("ds"), 10) || Vol3dViewer.defaultProps.dtScale,
+  dtScale: parseFloat(
+    initialParams.get("ds") || Vol3dViewer.defaultProps.dtScale
+  ),
   dataGamma: parseFloat(initialParams.get("dg"), 10) || dataGammaDefault,
   surfaceColor: initialParams.get("sc") || "#00ff00",
   dataColor: initialParams.get("dc") || "#ff00ff",
-  finalGamma: parseInt(
-    initialParams.get("fg") || Vol3dViewer.defaultProps.finalGamma,
-    10
+  finalGamma: parseFloat(
+    initialParams.get("fg") || Vol3dViewer.defaultProps.finalGamma
   ),
   alphaScale: parseFloat(initialParams.get("as") || 1.0),
   peak: parseInt(initialParams.get("dp") || peakDefault, 10),
