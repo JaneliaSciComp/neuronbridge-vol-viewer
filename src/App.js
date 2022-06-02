@@ -12,6 +12,7 @@ function App() {
       <Navigation />
       <Content>
         <VolumeDataLoader />
+        <span className="version">v{process.env.REACT_APP_VERSION}</span>
       </Content>
     </Layout>
   );
