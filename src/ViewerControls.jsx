@@ -47,10 +47,15 @@ export default function ViewerControls({
   const swcUrl = searchParams.get("swc");
   const h5jUrl = searchParams.get("h5j");
 
-  useEventListener("keydown", ({ key }) => {
+  useEventListener("keydown", (event) => {
+    const { key } = event;
     if (key === "l") {
       setUseLighting(!useLighting);
     } else if (key === " ") {
+      // have to prevent the default behavior here or hitting the spacebar when
+      // one of the control buttons is focused will cause their onClick event
+      // to fire.
+      // event.preventDefault();
       onSurfaceHide(!useSurface);
     }
   });
@@ -82,8 +87,13 @@ export default function ViewerControls({
     onSurfaceHide(!useSurface);
   };
 
-  const handleMirrorToggle = () => {
+  const handleMirrorToggle = async (event) => {
     onMirrorChange(!mirroredX);
+    // need to blur the target <span> and the parent <button> to
+    // prevent continued clicks when toggling the EM surface with
+    // the spacebar.
+    event.target.blur();
+    event.target.parentNode.blur();
   };
 
   return (
