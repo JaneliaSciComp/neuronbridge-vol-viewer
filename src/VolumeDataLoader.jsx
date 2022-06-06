@@ -76,6 +76,31 @@ function parameterReducer(state, action) {
     return updatedState;
   } else if (action.type === "reset") {
     return defaultState;
+  } else if (action.type === "resetCamera") {
+    // merge the default camera state with the existing state for all
+    // other parameters.
+    const updatedState = {
+      ...state,
+      cameraUp: defaultState.cameraUp,
+      cameraPosition: defaultState.cameraPosition,
+    };
+    return updatedState;
+  } else if (action.type === "resetParameters") {
+    // merge the default parameters state with the existing state for all
+    // other parameters.
+    const updatedState = {
+      ...state,
+      dtScale: defaultState.dtScale,
+      dataGamma: defaultState.dataGamma,
+      surfaceColor: defaultState.surfaceColor,
+      dataColor: defaultState.dataColor,
+      finalGamma: defaultState.finalGamma,
+      alphaScale: defaultState.alphaScale,
+      peak: defaultState.peak,
+      mirroredX: defaultState.mirrored,
+      speedUp: defaultState.speedUp,
+    };
+    return updatedState;
   }
   throw Error("Unknown action");
 }
@@ -114,6 +139,32 @@ export default function VolumeDataLoader() {
     )
   );
 
+  const onResetCamera = () => {
+    let updatedSearchParams = new URLSearchParams(searchParams.toString());
+    updatedSearchParams.set("upx", defaultState.cameraUp[0]);
+    updatedSearchParams.set("upy", defaultState.cameraUp[1]);
+    updatedSearchParams.set("upz", defaultState.cameraUp[2]);
+    updatedSearchParams.set("cx", defaultState.cameraPosition[0]);
+    updatedSearchParams.set("cy", defaultState.cameraPosition[1]);
+    updatedSearchParams.set("cz", defaultState.cameraPosition[2]);
+    dispatch({ type: "resetCamera" });
+    setForceUpdate((count) => count + 1);
+    setSearchParams(updatedSearchParams.toString());
+  };
+
+  const onResetParameters = () => {
+    dispatch({ type: "resetParameters" });
+    let updatedSearchParams = new URLSearchParams(searchParams.toString());
+    updatedSearchParams.set("dp", defaultState.peak);
+    updatedSearchParams.set("sc", defaultState.surfaceColor);
+    updatedSearchParams.set("dc", defaultState.dataColor);
+    updatedSearchParams.set("dg", defaultState.dataGamma);
+    updatedSearchParams.set("fg", defaultState.finalGamma);
+    updatedSearchParams.set("as", defaultState.alphaScale);
+    updatedSearchParams.set("mx", defaultState.mirroredX);
+    setSearchParams(updatedSearchParams.toString());
+  };
+
   const onReset = () => {
     dispatch({ type: "reset" });
     let updatedSearchParams = new URLSearchParams(searchParams.toString());
@@ -137,7 +188,6 @@ export default function VolumeDataLoader() {
     updatedSearchParams.set("mx", defaultState.mirroredX);
 
     setForceUpdate((count) => count + 1);
-
     setSearchParams(updatedSearchParams.toString());
   };
 
@@ -458,6 +508,8 @@ export default function VolumeDataLoader() {
               alphaScale={paramState.alphaScale}
               onAlphaChange={onAlphaScaleChange}
               onReset={onReset}
+              onResetCamera={onResetCamera}
+              onResetParameters={onResetParameters}
             />
           </Col>
         ) : (

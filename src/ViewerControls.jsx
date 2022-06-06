@@ -1,6 +1,15 @@
 import PropTypes from "prop-types";
 import useEventListener from "@use-it/event-listener";
-import { Tooltip, Slider, Row, Col, Button, Typography } from "antd";
+import {
+  Tooltip,
+  Slider,
+  Row,
+  Col,
+  Button,
+  Dropdown,
+  Menu,
+  Typography,
+} from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { convertUrlToFileName } from "./utils";
 import { useSearchParams } from "react-router-dom";
@@ -42,10 +51,36 @@ export default function ViewerControls({
   alphaScale,
   onAlphaChange,
   onReset,
+  onResetCamera,
+  onResetParameters,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const swcUrl = searchParams.get("swc");
   const h5jUrl = searchParams.get("h5j");
+
+  const handleMenuClick = (e) => {
+    if (e.key === "camera") {
+      onResetCamera();
+    } else if (e.key === "params") {
+      onResetParameters();
+    }
+  };
+
+  const menu = (
+    <Menu
+      onClick={handleMenuClick}
+      items={[
+        {
+          label: "Reset Camera Position",
+          key: "camera",
+        },
+        {
+          label: "Reset Display Parameters",
+          key: "params",
+        },
+      ]}
+    />
+  );
 
   useEventListener("keydown", (event) => {
     const { key } = event;
@@ -349,9 +384,16 @@ export default function ViewerControls({
         </Col>
       </Row>
       <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
-        <Button type="primary" size="small" ghost onClick={onReset}>
+        <Dropdown.Button
+          onClick={onReset}
+          type="primary"
+          size="small"
+          ghost
+          overlay={menu}
+          className="ghosted"
+        >
           Reset
-        </Button>
+        </Dropdown.Button>
       </Row>
     </>
   );
@@ -382,4 +424,6 @@ ViewerControls.propTypes = {
   alphaScale: PropTypes.number.isRequired,
   onAlphaChange: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
+  onResetParameters: PropTypes.func.isRequired,
+  onResetCamera: PropTypes.func.isRequired,
 };

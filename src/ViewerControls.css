@@ -8,9 +8,9 @@
 }
 
 .viewerControls input {
-  color:#000;
-  background:#000;
-  color:#fff;
+  color: #000;
+  background: #000;
+  color: #fff;
   border: 1px solid #777;
   border-radius: 5px;
 }
@@ -23,12 +23,12 @@
   margin-right: 1em;
 }
 
-.viewerControls input[type=number] {
+.viewerControls input[type="number"] {
   width: 100%;
 }
 
-.fileControls input[type=color] {
-  height : 20px;
+.fileControls input[type="color"] {
+  height: 20px;
   width: 20px;
   margin: 0 1em 0 0.3em;
 }
@@ -38,12 +38,12 @@
 }
 
 .controlsDivider {
-  border:none;
+  border: none;
   height: 1px;
   color: #444;
   background-color: #444;
   width: 85%;
-  margin:1em auto;
+  margin: 1em auto;
 }
 
 /*
@@ -57,4 +57,25 @@
 
 .ant-slider:hover .ant-slider-track {
   background: none;
+}
+
+.ghosted button {
+  color: #008b94;
+  border-color: #008b94;
+  background: transparent;
+}
+
+.ghosted .ant-dropdown-open {
+  color: #008b94;
+  border-color: #008b94;
+  background: transparent;
+}
+
+.ant-btn-group .ant-btn-primary:first-child:not(:last-child) {
+  border-right-color: #008b94;
+}
+
+.ant-btn-group .ant-btn-primary:last-child:not(:first-child),
+.ant-btn-group .ant-btn-primary + .ant-btn-primary {
+  border-left-color: #008b94;
 }
