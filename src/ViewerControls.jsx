@@ -133,16 +133,34 @@ export default function ViewerControls({
 
   return (
     <>
-      <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
-        <Button
-          type="primary"
-          ghost
-          size="small"
-          onClick={() => setShowControls(false)}
-        >
-          Close
-        </Button>
+      <Row className="fileControls">
+        <Col span={16}>
+          <label htmlFor="surfaceColor">
+            EM: {convertUrlToFileName(swcUrl)}
+          </label>
+        </Col>
+        <Col span={3}>
+          <input
+            id="surfaceColor"
+            name="surfaceColor"
+            type="color"
+            value={surfaceColor}
+            onChange={onSurfaceColorInputChange}
+          />
+        </Col>
+        <Col span={5} style={{ textAlign: "right" }}>
+          <Button
+            size="small"
+            type="primary"
+            ghost
+            onClick={handleSurfaceToggle}
+          >
+            {useSurface ? "Hide" : "Show"}
+          </Button>
+        </Col>
       </Row>
+      <hr className="controlsDivider" />
+
       <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="dataColor">
@@ -163,7 +181,7 @@ export default function ViewerControls({
             onChange={onDataColorChange}
           />
         </Col>
-        <Col span={5}>
+        <Col span={5} style={{ textAlign: "right" }}>
           <Button
             size="small"
             type="primary"
@@ -300,33 +318,6 @@ export default function ViewerControls({
         </Col>
       </Row>
       <hr className="controlsDivider" />
-      <Row className="fileControls">
-        <Col span={16}>
-          <label htmlFor="surfaceColor">
-            EM: {convertUrlToFileName(swcUrl)}
-          </label>
-        </Col>
-        <Col span={3}>
-          <input
-            id="surfaceColor"
-            name="surfaceColor"
-            type="color"
-            value={surfaceColor}
-            onChange={onSurfaceColorInputChange}
-          />
-        </Col>
-        <Col span={5}>
-          <Button
-            size="small"
-            type="primary"
-            ghost
-            onClick={handleSurfaceToggle}
-          >
-            {useSurface ? "Hide" : "Show"}
-          </Button>
-        </Col>
-      </Row>
-      <hr className="controlsDivider" />
       <Row className="viewerControls">
         <Tooltip placement="left" color="#008b94" title="Alpha Scale">
           <label htmlFor="alphaScale">Alpha Scale</label>{" "}
@@ -384,6 +375,16 @@ export default function ViewerControls({
         </Col>
       </Row>
       <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
+        <Button
+          type="primary"
+          ghost
+          size="small"
+          onClick={() => setShowControls(false)}
+          style={{ marginRight: "1em" }}
+        >
+          Close
+        </Button>
+
         <Dropdown.Button
           onClick={onReset}
           type="primary"

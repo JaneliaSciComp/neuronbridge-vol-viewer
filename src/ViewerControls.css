@@ -3,10 +3,6 @@
   text-align: center;
 }
 
-.viewerControls label {
-  margin-left: 1em;
-}
-
 .viewerControls input {
   color: #000;
   background: #000;
@@ -42,8 +38,8 @@
   height: 1px;
   color: #444;
   background-color: #444;
-  width: 85%;
-  margin: 1em auto;
+  width: 92%;
+  margin: 1em;
 }
 
 /*
