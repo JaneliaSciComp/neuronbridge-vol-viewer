@@ -60,7 +60,7 @@ const defaultState = {
   ),
   alphaScale: parseFloat(initialParams.get("as") || 1.0),
   peak: parseInt(initialParams.get("dp") || peakDefault, 10),
-  mirroredX: Boolean(initialParams.get("mx")) || false,
+  mirroredX: initialParams.get("mx") === "true",
   speedUp: defaultSpeedUp,
   cameraUp: [
     parseFloat(initialParams.get("upx") || 0),
