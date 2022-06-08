@@ -317,9 +317,12 @@ export default function ViewerControls({
           />
         </Col>
       </Row>
-      <hr className="controlsDivider" />
       <Row className="viewerControls">
-        <Tooltip placement="left" color="#008b94" title="Alpha Scale">
+        <Tooltip
+          placement="left"
+          color="#008b94"
+          title="Alpha Scale: (0.1 - 1) Lower value makes LM more transparent."
+        >
           <label htmlFor="alphaScale">Alpha Scale</label>{" "}
           <QuestionCircleOutlined />
         </Tooltip>
@@ -352,9 +355,13 @@ export default function ViewerControls({
           />
         </Col>
       </Row>
-
+      <hr className="controlsDivider" />
       <Row className="viewerControls">
-        <Tooltip placement="left" color="#008b94" title="Speed Up">
+        <Tooltip
+          placement="left"
+          color="#008b94"
+          title="Speed Up: (1 - 20) Higher value makes camera manipulation faster by temporarily reducing image resolution."
+        >
           <label htmlFor="speedUp">Speed Up</label> <QuestionCircleOutlined />
         </Tooltip>
       </Row>
@@ -389,7 +396,6 @@ export default function ViewerControls({
           onClick={onReset}
           type="primary"
           size="small"
-          ghost
           overlay={menu}
           className="ghosted"
         >
