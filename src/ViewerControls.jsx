@@ -402,6 +402,18 @@ export default function ViewerControls({
           Reset
         </Dropdown.Button>
       </Row>
+      <Row style={{ padding: "0.5em 1em", marginTop: "3em" }}>
+        <Col span={24}>
+          <p>Keyboard shortcuts</p>
+          <p>
+            <kbd>space</kbd> - toggle EM visibility
+          </p>
+          <p>
+            <kbd>&larr;</kbd> <kbd>&uarr;</kbd> <kbd>&rarr;</kbd>{" "}
+            <kbd>&darr;</kbd> - pan image
+          </p>
+        </Col>
+      </Row>
     </>
   );
 }
