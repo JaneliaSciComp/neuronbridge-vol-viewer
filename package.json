@@ -1,6 +1,6 @@
 {
   "name": "neuronbridge-vol-viewer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@janelia/web-h5j-loader": "^1.0.1",
