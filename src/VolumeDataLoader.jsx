@@ -111,6 +111,7 @@ export default function VolumeDataLoader() {
   const [h5jUrl, setH5jUrl] = React.useState(null);
   const [channel, setChannel] = React.useState(null);
   const [swcUrl, setSwcUrl] = React.useState(null);
+  const [objUrl, setObjUrl] = React.useState(null);
   const [ffmpegWasm, setFfmpegWasm] = React.useState(null);
   const [volumeSize, setVolumeSize] = React.useState(null);
   const [voxelSize, setVoxelSize] = React.useState(null);
@@ -352,6 +353,7 @@ export default function VolumeDataLoader() {
 
   const h5jParam = searchParams.get("h5j");
   const swcParam = searchParams.get("swc");
+  const objParam = searchParams.get("obj");
   const channelParam = searchParams.get("ch");
 
   React.useEffect(() => {
@@ -360,6 +362,9 @@ export default function VolumeDataLoader() {
     }
     if (swcParam !== "") {
       setSwcUrl(swcParam);
+    }
+    if (objParam !== "") {
+      setObjUrl(objParam);
     }
     if (channelParam !== "") {
       setChannel(channelParam);
@@ -417,10 +422,10 @@ export default function VolumeDataLoader() {
   }, [h5jUrl, channel, ffmpegWasm]);
 
   React.useEffect(() => {
-    async function loadSwcData(swcUrl) {
-      const text = await textFromFileOrURL(swcUrl);
+    async function loadData(dataUrl, isObj) {
+      const text = await textFromFileOrURL(dataUrl);
       let mesh = null;
-      if (isObjSource(swcUrl)) {
+      if (isObj) {
         mesh = makeObjSurface(text, paramState.surfaceColor);
       } else {
         const json = parseSwc(text);
@@ -444,9 +449,11 @@ export default function VolumeDataLoader() {
     }
 
     if (swcUrl) {
-      loadSwcData(swcUrl);
+      loadData(swcUrl);
+    } else if (objUrl) {
+      loadData(objUrl, true);
     }
-  }, [swcUrl, paramState.surfaceColor, units, voxelSize, volumeSize]);
+  }, [swcUrl, objUrl, paramState.surfaceColor, units, voxelSize, volumeSize]);
 
   if (h5jLoadingError) {
     let errorMessage = `Error Loading the volume data: ${h5jLoadingError}`;

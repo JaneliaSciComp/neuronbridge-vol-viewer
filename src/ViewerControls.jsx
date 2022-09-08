@@ -56,6 +56,7 @@ export default function ViewerControls({
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const swcUrl = searchParams.get("swc");
+  const objUrl = searchParams.get("obj");
   const h5jUrl = searchParams.get("h5j");
 
   const handleMenuClick = (e) => {
@@ -136,7 +137,7 @@ export default function ViewerControls({
       <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="surfaceColor">
-            EM: {convertUrlToFileName(swcUrl)}
+            EM: {convertUrlToFileName(objUrl || swcUrl)}
           </label>
         </Col>
         <Col span={3}>
