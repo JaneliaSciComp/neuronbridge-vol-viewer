@@ -17,6 +17,7 @@ import {
   surfaceAlignmentFactors,
 } from "@janelia/web-vol-viewer/dist/Utils";
 import { makeSwcSurface, parseSwc } from "@janelia/web-vol-viewer/dist/Swc";
+import { makeObjSurface, isObjSource } from "@janelia/web-vol-viewer/dist/Obj";
 import { Vol3dViewer } from "@janelia/web-vol-viewer";
 import { makeFluoTransferTex } from "@janelia/web-vol-viewer/dist/TransferFunctions";
 import ViewerControls from "./ViewerControls";
@@ -418,8 +419,13 @@ export default function VolumeDataLoader() {
   React.useEffect(() => {
     async function loadSwcData(swcUrl) {
       const text = await textFromFileOrURL(swcUrl);
-      const json = parseSwc(text);
-      const mesh = makeSwcSurface(json, paramState.surfaceColor);
+      let mesh = null;
+      if (isObjSource(swcUrl)) {
+        mesh = makeObjSurface(text, paramState.surfaceColor);
+      } else {
+        const json = parseSwc(text);
+        mesh = makeSwcSurface(json, paramState.surfaceColor);
+      }
       const { surfaceScale, surfaceTranslation } = surfaceAlignmentFactors(
         units,
         volumeSize,
