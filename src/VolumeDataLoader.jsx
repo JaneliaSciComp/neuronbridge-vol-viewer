@@ -151,7 +151,7 @@ export default function VolumeDataLoader() {
     updatedSearchParams.set("cz", defaultState.cameraPosition[2]);
     dispatch({ type: "resetCamera" });
     setForceUpdate((count) => count + 1);
-    setSearchParams(updatedSearchParams.toString());
+    setSearchParams(updatedSearchParams.toString(), { replace: true });
   };
 
   const onResetParameters = () => {
@@ -164,7 +164,7 @@ export default function VolumeDataLoader() {
     updatedSearchParams.set("fg", defaultState.finalGamma);
     updatedSearchParams.set("as", defaultState.alphaScale);
     updatedSearchParams.set("mx", defaultState.mirroredX);
-    setSearchParams(updatedSearchParams.toString());
+    setSearchParams(updatedSearchParams.toString(), { replace: true });
   };
 
   const onReset = () => {
@@ -190,7 +190,7 @@ export default function VolumeDataLoader() {
     updatedSearchParams.set("mx", defaultState.mirroredX);
 
     setForceUpdate((count) => count + 1);
-    setSearchParams(updatedSearchParams.toString());
+    setSearchParams(updatedSearchParams.toString(), { replace: true });
   };
 
   React.useEffect(() => {
@@ -220,7 +220,7 @@ export default function VolumeDataLoader() {
     newParameters.forEach((newParam) => {
       updatedSearchParams.set(newParam.name, newParam.value);
     });
-    setSearchParams(updatedSearchParams.toString());
+    setSearchParams(updatedSearchParams.toString(), { replace: true });
   }, 500);
 
   const onDataColorInputChange = (event) => {
