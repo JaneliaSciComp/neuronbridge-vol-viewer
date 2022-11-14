@@ -17,7 +17,8 @@ import {
   surfaceAlignmentFactors,
 } from "@janelia/web-vol-viewer/dist/Utils";
 import { makeSwcSurface, parseSwc } from "@janelia/web-vol-viewer/dist/Swc";
-import { makeObjSurface, isObjSource } from "@janelia/web-vol-viewer/dist/Obj";
+import { makeObjSurface } from "@janelia/web-vol-viewer/dist/Obj";
+import { getBoxSize } from "@janelia/web-vol-viewer/dist/Utils";
 import { Vol3dViewer } from "@janelia/web-vol-viewer";
 import { makeFluoTransferTex } from "@janelia/web-vol-viewer/dist/TransferFunctions";
 import ViewerControls from "./ViewerControls";
@@ -48,6 +49,45 @@ function getCameraPosition(searchParams) {
   return defaultPosition;
 }
 
+function adjustCameraPositionToFit(
+  position,
+  up,
+  fovVerticalDegrees,
+  viewWidth,
+  viewHeight,
+  volumeSize,
+  voxelSize
+) {
+  // For now, at least the implementation is a simple approach that works only if
+  // both the camera view vector and up vector are aligned with principle axes.
+  const posNonZeros = position.reduce((p, c) => p + (c !== 0.0), 0);
+  const posOnPrincipleAxis = posNonZeros === 1;
+  const upNonZeros = up.reduce((p, c) => p + (c !== 0.0), 0);
+  const upOnPrincipleAxis = upNonZeros === 1;
+  if (posOnPrincipleAxis && upOnPrincipleAxis) {
+    const fovVerticalRadians = (fovVerticalDegrees / 180.0) * Math.PI;
+    let fitPosition = position;
+
+    const iAxisPos = position.findIndex((e) => e !== 0.0);
+    const iOther1Pos = (iAxisPos + 1) % 3;
+    const iOther2Pos = (iAxisPos + 2) % 3;
+    const boxSize = getBoxSize(volumeSize, voxelSize);
+    const iAxisBox =
+      boxSize[iOther1Pos] > boxSize[iOther2Pos] ? iOther1Pos : iOther2Pos;
+    const iAxisUp = up.findIndex((e) => e !== 0.0);
+
+    let angle = fovVerticalRadians / 2;
+    if (iAxisBox !== iAxisUp) {
+      angle = Math.tan(fovVerticalRadians / 2) * (viewWidth / viewHeight);
+    }
+    const r = boxSize[iAxisBox] / 2;
+    const d = r / Math.tan(angle);
+    fitPosition[iAxisPos] = d;
+    return fitPosition;
+  }
+  return position;
+}
+
 const initialParams = new URLSearchParams(window.location.search);
 const defaultState = {
   dtScale: parseFloat(
@@ -69,6 +109,7 @@ const defaultState = {
     parseFloat(initialParams.get("upz") || 0),
   ],
   cameraPosition: getCameraPosition(initialParams),
+  cameraFovDegrees: 45.0,
 };
 
 function parameterReducer(state, action) {
@@ -84,6 +125,7 @@ function parameterReducer(state, action) {
       ...state,
       cameraUp: defaultState.cameraUp,
       cameraPosition: defaultState.cameraPosition,
+      cameraFovDegrees: defaultState.cameraFovDegrees,
     };
     return updatedState;
   } else if (action.type === "resetParameters") {
@@ -128,6 +170,9 @@ export default function VolumeDataLoader() {
   const [swcSurfaceMesh, setSwcSurfaceMesh] = React.useState(null);
   const [showControls, setShowControls] = React.useState(true);
   const [forceUpdate, setForceUpdate] = React.useState(0);
+
+  const [hasInitialPosition, setHasInitialPosition] = React.useState(null);
+  const mountRef = React.useRef(null);
 
   const allowThrottledEvent = React.useRef(false);
 
@@ -369,11 +414,33 @@ export default function VolumeDataLoader() {
     if (channelParam !== "") {
       setChannel(channelParam);
     }
-  }, [h5jParam, swcParam, channelParam]);
+  }, [h5jParam, swcParam, channelParam, objParam]);
+
+  // Record whether the initial URL contained a camera position (because if not,
+  // an initial camera position should be computed to fit the data box).  Do it
+  // only once (i.e., use `[]` as the dependencies) because a camera position will
+  // be added during subsequent interaction.
+  const camXParam = searchParams.get("cx");
+  const camYParam = searchParams.get("cy");
+  const camZParam = searchParams.get("cz");
+  React.useEffect(() => {
+    let has = false;
+    if (camXParam && camYParam && camZParam) {
+      has = true;
+    }
+    setHasInitialPosition(has);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onProgress = ({ ratio }) => {
     setLoadingPercent(Math.round(ratio * 100));
   };
+
+  // For the `span` argument of the Ant Design `Col` elements, and also needed
+  // when computing the default camera position.
+  const MAIN_COL_COUNT_DEFAULT = 16;
+  const TOTAL_COL_COUNT = 24;
+  const CONTROLS_COL_COUNT = TOTAL_COL_COUNT - MAIN_COL_COUNT_DEFAULT;
 
   React.useEffect(() => {
     setH5jLoadingError(null);
@@ -406,20 +473,46 @@ export default function VolumeDataLoader() {
         ff
       );
       if (data) {
-        setVolumeSize(fixVolumeSize(volSize, data));
+        const volSizeFixed = fixVolumeSize(volSize, data);
+        setVolumeSize(volSizeFixed);
 
         // Treat the `ArrayBuffer` as an array of unsigned 8-bit integers.
         // Doing so should not copy the underlying data, and is necessary
         // to make the `THREE.DataTexture3D`.
         const dUint8 = new Uint8Array(data.buffer);
         setDataUint8(dUint8);
+
+        if (!hasInitialPosition) {
+          const mnt = mountRef.current;
+          if (mnt) {
+            const fraction = MAIN_COL_COUNT_DEFAULT / TOTAL_COL_COUNT;
+            const viewWidth = mnt.clientWidth * fraction;
+            const viewHeight = mnt.clientHeight;
+
+            defaultState.cameraPosition = adjustCameraPositionToFit(
+              defaultState.cameraPosition,
+              defaultState.cameraUp,
+              defaultState.cameraFovDegrees,
+              viewWidth,
+              viewHeight,
+              volSizeFixed,
+              voxSize
+            );
+
+            dispatch({
+              type: "update",
+              value: defaultState.cameraPosition,
+              parameter: "cameraPosition",
+            });
+          }
+        }
       }
     }
 
     if (h5jUrl && channel) {
       loadh5j(h5jUrl, channel);
     }
-  }, [h5jUrl, channel, ffmpegWasm]);
+  }, [h5jUrl, channel, ffmpegWasm, hasInitialPosition]);
 
   React.useEffect(() => {
     async function loadData(dataUrl, isObj) {
@@ -430,6 +523,9 @@ export default function VolumeDataLoader() {
       } else {
         const json = parseSwc(text);
         mesh = makeSwcSurface(json, paramState.surfaceColor);
+      }
+      if (!mesh) {
+        return;
       }
       const { surfaceScale, surfaceTranslation } = surfaceAlignmentFactors(
         units,
@@ -456,7 +552,7 @@ export default function VolumeDataLoader() {
   }, [swcUrl, objUrl, paramState.surfaceColor, units, voxelSize, volumeSize]);
 
   if (h5jLoadingError) {
-    let errorMessage = `Error Loading the volume data: ${h5jLoadingError}`;
+    let errorMessage = `Error loading the volume data: ${h5jLoadingError}`;
     if (h5jLoadingError.match(/out of memory/i)) {
       errorMessage =
         "This device does not have sufficient memory available to render the supplied volume.";
@@ -471,7 +567,7 @@ export default function VolumeDataLoader() {
   if (dataUint8) {
     return (
       <Row style={{ height: "100%" }}>
-        <Col span={showControls ? 16 : 24}>
+        <Col span={showControls ? MAIN_COL_COUNT_DEFAULT : TOTAL_COL_COUNT}>
           <Vol3dViewer
             key={forceUpdate}
             volumeDataUint8={dataUint8}
@@ -491,11 +587,12 @@ export default function VolumeDataLoader() {
             useVolumeMirrorX={paramState.mirroredX}
             cameraPosition={paramState.cameraPosition}
             cameraUp={paramState.cameraUp}
+            cameraFovDegrees={paramState.cameraFovDegrees}
             interactionSpeedup={paramState.speedUp}
           />
         </Col>
         {showControls ? (
-          <Col span={8}>
+          <Col span={CONTROLS_COL_COUNT}>
             <ViewerControls
               onFinalGammaChange={onFinalGammaChange}
               finalGamma={paramState.finalGamma}
@@ -553,7 +650,7 @@ export default function VolumeDataLoader() {
     );
   }
   return (
-    <div className="Vol3dPlaceHolder">
+    <div className="Vol3dPlaceHolder" ref={mountRef}>
       <div className="statusMessage">
         <h1>Volume Data Loading: {loadingPercent}%</h1>
       </div>
