@@ -602,6 +602,7 @@ export default function VolumeDataLoader() {
         {showControls ? (
           <Col span={CONTROLS_COL_COUNT}>
             <ViewerControls
+              channel={channel}
               onFinalGammaChange={onFinalGammaChange}
               finalGamma={paramState.finalGamma}
               peak={paramState.peak}

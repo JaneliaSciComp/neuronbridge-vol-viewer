@@ -27,6 +27,7 @@ const alphaScaleMin = 0;
 const alphaScaleMax = 1;
 
 export default function ViewerControls({
+  channel,
   onFinalGammaChange,
   finalGamma,
   peak,
@@ -135,6 +136,20 @@ export default function ViewerControls({
   return (
     <>
       <Row className="fileControls">
+        <Col span={12}>Controls</Col>
+        <Col span={12} style={{ textAlign: "right" }}>
+          <Button
+            type="primary"
+            ghost
+            size="small"
+            onClick={() => setShowControls(false)}
+          >
+            Close
+          </Button>
+        </Col>
+      </Row>
+      <hr className="controlsDivider" />
+      <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="surfaceColor">
             EM: {convertUrlToFileName(objUrl || swcUrl)}
@@ -165,11 +180,15 @@ export default function ViewerControls({
       <Row className="fileControls">
         <Col span={16}>
           <label htmlFor="dataColor">
+            LM
             <Text
               ellipsis={{ tooltip: convertUrlToFileName(h5jUrl) }}
-              style={{ width: 400, color: "#fff" }}
+              style={{ marginLeft: "1rem", width: 600, color: "#fff" }}
             >
-              LM: {convertUrlToFileName(h5jUrl)}
+              Line: {convertUrlToFileName(h5jUrl)}
+            </Text>
+            <Text style={{ marginLeft: "1rem", width: 400, color: "#fff" }}>
+              Channel: {channel}
             </Text>
           </label>
         </Col>
@@ -383,16 +402,6 @@ export default function ViewerControls({
         </Col>
       </Row>
       <Row style={{ justifyContent: "flex-end", padding: "0.5em 1em" }}>
-        <Button
-          type="primary"
-          ghost
-          size="small"
-          onClick={() => setShowControls(false)}
-          style={{ marginRight: "1em" }}
-        >
-          Close
-        </Button>
-
         <Dropdown.Button
           onClick={onReset}
           type="primary"
@@ -420,6 +429,7 @@ export default function ViewerControls({
 }
 
 ViewerControls.propTypes = {
+  channel: PropTypes.string.isRequired,
   onFinalGammaChange: PropTypes.func.isRequired,
   finalGamma: PropTypes.number.isRequired,
   onPeakChange: PropTypes.func.isRequired,
