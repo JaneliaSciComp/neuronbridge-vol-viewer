@@ -453,12 +453,12 @@ export default function VolumeDataLoader() {
       // Need to check for incorrect voxel size of Brain images here.
       // If they are of the 0.44 variety, then they need to be temporarily
       // changed to the 0.51~ size.
-      const adjustedVoxSize =
+      /* const adjustedVoxSize =
         voxSize[0] === 0.44 && voxSize[1] === 0.44
           ? [0.518916, 0.518916, 1.0]
-          : voxSize;
+          : voxSize; */
 
-      setVoxelSize(adjustedVoxSize);
+      setVoxelSize(voxSize);
       setUnits(attrs.unit);
 
       let ff = ffmpegWasm;
