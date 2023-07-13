@@ -1,8 +1,12 @@
 header {
-  position: fixed;
+  /* position: fixed; */
   z-index: 50;
-  width: 100%;
+  /* width: 100%; */
   background: #333;
+}
+
+.header {
+  grid-area: hd;
 }
 
 header img {
@@ -16,6 +20,6 @@ header img {
 }
 
 .janeliaLogo img {
-  margin-top: -7px;
+  margin-top: 9px;
   margin-left: 1em;
 }

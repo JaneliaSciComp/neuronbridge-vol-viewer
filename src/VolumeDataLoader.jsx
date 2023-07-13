@@ -574,8 +574,8 @@ export default function VolumeDataLoader() {
 
   if (dataUint8) {
     return (
-      <Row style={{ height: "100%" }}>
-        <Col span={showControls ? MAIN_COL_COUNT_DEFAULT : TOTAL_COL_COUNT}>
+      <>
+        <div className={showControls ? "viewer" : "viewerFull"}>
           <Vol3dViewer
             key={forceUpdate}
             volumeDataUint8={dataUint8}
@@ -598,9 +598,9 @@ export default function VolumeDataLoader() {
             cameraFovDegrees={paramState.cameraFovDegrees}
             interactionSpeedup={paramState.speedUp}
           />
-        </Col>
+        </div>
         {showControls ? (
-          <Col span={CONTROLS_COL_COUNT}>
+          <div className="sidebar">
             <ViewerControls
               channel={channel}
               onFinalGammaChange={onFinalGammaChange}
@@ -630,7 +630,7 @@ export default function VolumeDataLoader() {
               onResetCamera={onResetCamera}
               onResetParameters={onResetParameters}
             />
-          </Col>
+          </div>
         ) : (
           <Button
             className="showButton"
@@ -641,20 +641,18 @@ export default function VolumeDataLoader() {
             Controls
           </Button>
         )}
-      </Row>
+      </>
     );
   }
   if (!h5jParam || !swcParam) {
     return (
-      <div className="Vol3dPlaceHolder">
-        <div className="statusMessage">
-          <h1>Missing Source Files</h1>
-          <p>
-            Please return to{" "}
-            <a href="https://neuronbridge.janelia.org">neuronbridge</a> to
-            select a result for viewing.
-          </p>
-        </div>
+      <div className="statusMessage">
+        <h1>Missing Source Files</h1>
+        <p>
+          Please return to{" "}
+          <a href="https://neuronbridge.janelia.org">neuronbridge</a> to select
+          a result for viewing.
+        </p>
       </div>
     );
   }

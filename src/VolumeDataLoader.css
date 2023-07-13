@@ -1,4 +1,8 @@
 .Vol3dPlaceHolder {
+  grid-row-start: 2;
+  grid-row-end: 2;
+  grid-column-start: 1;
+  grid-column-end: -1;
   flex-grow: 1;
   flex-shrink: 1;
   min-width: 0;
@@ -9,6 +13,7 @@
 
 .Vol3dViewer {
   height: 100%;
+  width: 100%;
 }
 
 .statusMessage {
@@ -33,4 +38,24 @@
   position: absolute;
   top: 5em;
   right: 1em;
+}
+
+.sidebar {
+  padding: 0;
+  grid-area: sd;
+  overflow: scroll;
+  height: 100%;
+}
+
+.viewer {
+  grid-area: main;
+  overflow: hidden;
+}
+
+.viewerFull {
+  grid-row-start: 2;
+  grid-row-end: 2;
+  grid-column-start: 1;
+  grid-column-end: -1;
+  display: grid;
 }

@@ -1,5 +1,7 @@
 body {
   margin: 0px;
+  background:#222;
+  overflow: scroll !important;
 }
 
 .ant-layout, #root {

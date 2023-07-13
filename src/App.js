@@ -8,13 +8,10 @@ const { Content } = Layout;
 
 function App() {
   return (
-    <Layout>
+    <div className="container">
       <Navigation />
-      <Content>
-        <VolumeDataLoader />
-        <span className="version">v{process.env.REACT_APP_VERSION}</span>
-      </Content>
-    </Layout>
+      <VolumeDataLoader />
+    </div>
   );
 }
 

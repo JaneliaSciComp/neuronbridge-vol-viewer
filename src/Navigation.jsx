@@ -2,15 +2,14 @@ import neuronbridgeLogo from "./neuronbridge_logo.png";
 import janeliaLogo from "./janelia_logo.png";
 import flyemLogo from "./flyemLogo.png";
 import flylightLogo from "./flylightlogo.png";
-import { Layout, Menu } from "antd";
+import { Menu } from "antd";
 import RefLink from "./RefLink";
 
 import "./Navigation.css";
 
-const { Header } = Layout;
 export default function Navigation() {
   return (
-    <Header>
+    <header className="header">
       <Menu
         className="nav-menu"
         theme="dark"
@@ -41,6 +40,6 @@ export default function Navigation() {
           <img src={janeliaLogo} alt="Janelia Research Campus" />
         </a>
       </div>
-    </Header>
+    </header>
   );
 }

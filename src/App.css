@@ -1,12 +1,16 @@
-.ant-layout-content {
-  margin-top: 64px;
+body {
   padding: 0;
-  display: flex;
-  flex-direction:column;
+  margin: 0;
 }
 
-.version {
-  position: absolute;
-  bottom: 1em;
-  right: 1em;
+.container {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  grid-template-rows: 40px 1fr;
+  grid-template-areas:
+    "hd hd"
+    "main sd"
+    "main sd";
+  gap: 0px;
+  height: 100vh;
 }

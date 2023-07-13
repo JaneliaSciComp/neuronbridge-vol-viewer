@@ -134,7 +134,7 @@ export default function ViewerControls({
   };
 
   return (
-    <>
+    <div className="controls">
       <Row className="fileControls">
         <Col span={12}>Controls</Col>
         <Col span={12} style={{ textAlign: "right" }}>
@@ -161,6 +161,7 @@ export default function ViewerControls({
             name="surfaceColor"
             type="color"
             value={surfaceColor}
+            className="colorPicker"
             onChange={onSurfaceColorInputChange}
           />
         </Col>
@@ -183,11 +184,11 @@ export default function ViewerControls({
             LM
             <Text
               ellipsis={{ tooltip: convertUrlToFileName(h5jUrl) }}
-              style={{ marginLeft: "1rem", width: 600, color: "#fff" }}
+              style={{ marginLeft: "1rem", width: 600, color: "#ccc" }}
             >
               Line: {convertUrlToFileName(h5jUrl)}
             </Text>
-            <Text style={{ marginLeft: "1rem", width: 400, color: "#fff" }}>
+            <Text style={{ marginLeft: "1rem", width: 400, color: "#ccc" }}>
               Channel: {channel}
             </Text>
           </label>
@@ -197,6 +198,7 @@ export default function ViewerControls({
             id="dataColor"
             name="dataColor"
             type="color"
+            className="colorPicker"
             value={dataColor}
             onChange={onDataColorChange}
           />
@@ -424,7 +426,8 @@ export default function ViewerControls({
           </p>
         </Col>
       </Row>
-    </>
+      <span className="version">v{process.env.REACT_APP_VERSION}</span>
+    </div>
   );
 }
 

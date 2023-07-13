@@ -1,3 +1,18 @@
+.controls {
+  height: 1000px;
+  padding-top: 2em;
+  color: #ccc;
+}
+
+.controls button {
+  width: 4em;
+}
+
+.colorPicker {
+  background: transparent;
+  border: 1px solid #008b94 !important;
+}
+
 .viewerControls {
   padding: 0.3em 1em;
   text-align: center;
@@ -89,4 +104,10 @@ kbd {
 .ant-btn-group .ant-btn-primary:last-child:not(:first-child),
 .ant-btn-group .ant-btn-primary + .ant-btn-primary {
   border-left-color: #008b94;
+}
+
+.version {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
 }
