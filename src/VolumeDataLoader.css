@@ -13,7 +13,6 @@
 
 .Vol3dViewer {
   height: 100%;
-  width: 100%;
 }
 
 .statusMessage {
@@ -50,6 +49,7 @@
 .viewer {
   grid-area: main;
   overflow: hidden;
+  background: #000;
 }
 
 .viewerFull {
