@@ -17,7 +17,7 @@ export default function RefLink() {
         setReferrer(referrer);
       } else if (
         referrer.match(
-          /^https?:\/\/janelia-neuronbridge-web-dev.s3-website-us-east-1.amazonaws.com/
+          /^https?:\/\/janelia-neuronbridge-web-(dev(pre)*|val).s3-website-us-east-1.amazonaws.com/
         )
       ) {
         setReferrer(referrer);
