@@ -2,10 +2,11 @@
   height: 1000px;
   padding-top: 2em;
   color: #ccc;
+  position: relative;
 }
 
 .controls button {
-  width: 4em;
+  width: 5em;
 }
 
 .colorPicker {
