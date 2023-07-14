@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Row, Col, Button } from "antd";
+import { Button } from "antd";
 import {
   getH5JAttrs,
   openH5J,
