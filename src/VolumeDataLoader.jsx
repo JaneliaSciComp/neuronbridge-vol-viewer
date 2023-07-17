@@ -597,6 +597,7 @@ export default function VolumeDataLoader() {
             cameraUp={paramState.cameraUp}
             cameraFovDegrees={paramState.cameraFovDegrees}
             interactionSpeedup={paramState.speedUp}
+            heightCorrection={false}
           />
         </div>
         {showControls ? (
