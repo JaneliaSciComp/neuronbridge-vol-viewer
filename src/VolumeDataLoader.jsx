@@ -28,7 +28,7 @@ import "./VolumeDataLoader.css";
 
 const alpha0 = 0;
 const alpha1 = 255;
-const peakDefault = 50; // global mean of 400 or so manually-labeled examples. Should provide a reasonable default for the peak value.
+const peakDefault = 50; // global mean of 400 or so manually-labeled examples. Should provide a reasonable default for the peak value.
 const dataGammaDefault = 0.5;
 const defaultSpeedUp = 2;
 
