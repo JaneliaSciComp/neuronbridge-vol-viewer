@@ -20,6 +20,7 @@ import { makeSwcSurface, parseSwc } from "@janelia/web-vol-viewer/dist/Swc";
 import { makeObjSurface } from "@janelia/web-vol-viewer/dist/Obj";
 import { getBoxSize } from "@janelia/web-vol-viewer/dist/Utils";
 import { Vol3dViewer } from "@janelia/web-vol-viewer";
+import usePeakPredictor from "@janelia/web-vol-viewer/dist/FluoTransferPeakPredictor";
 import { makeFluoTransferTex } from "@janelia/web-vol-viewer/dist/TransferFunctions";
 import ViewerControls from "./ViewerControls";
 import { useDebouncedCallback } from "use-debounce";
@@ -28,7 +29,8 @@ import "./VolumeDataLoader.css";
 
 const alpha0 = 0;
 const alpha1 = 255;
-const peakDefault = 50; // global mean of 400 or so manually-labeled examples. Should provide a reasonable default for the peak value.
+// Global mean of 400 or so manually-labeled examples, a reasonable default for the peak value.
+const peakDefault = 50;
 const dataGammaDefault = 0.5;
 const defaultSpeedUp = 2;
 
@@ -148,6 +150,19 @@ function parameterReducer(state, action) {
   throw Error("Unknown action");
 }
 
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = React.useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored !== null ? JSON.parse(stored) : initialValue;
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+
 export default function VolumeDataLoader() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [h5jUrl, setH5jUrl] = React.useState(null);
@@ -175,16 +190,61 @@ export default function VolumeDataLoader() {
   const mountRef = React.useRef(null);
 
   const allowThrottledEvent = React.useRef(false);
+  // Ensures a single run of the prediction of the peak value to use in transfer function.
+  const predictionStartedRef = React.useRef(false);
 
-  const [transferFunctionTex, setTransferFuncTex] = React.useState(
-    makeFluoTransferTex(
-      alpha0,
-      paramState.peak,
-      paramState.dataGamma,
-      alpha1,
-      paramState.dataColor
-    )
+  const [transferFunctionTex, setTransferFuncTex] = React.useState(null);
+  const invisibleTex = React.useMemo(
+    () => makeFluoTransferTex(alpha0, 255, 0, alpha1, paramState.dataColor),
+    [paramState.dataColor]
   );
+
+  React.useEffect(() => {
+    return () => {
+      if (transferFunctionTex) {
+        transferFunctionTex.dispose();
+      }
+    };
+  }, [transferFunctionTex]);
+
+  React.useEffect(() => {
+    return () => {
+      invisibleTex.dispose();
+    };
+  }, [invisibleTex]);
+
+  // Set up prediction of a good peak value for the transfer function, using a neural network.
+  // The last returned function, `predictFluoTransferPeak`, is called to actually do the prediction.
+  // Other returned values override `Vol3dViewer` props during prediction.
+  const [doPeakPrediction, setDoPeakPrediction] = useLocalStorage(
+    "neuronbridge-vol-viewer-do-peak-prediction",
+    true
+  );
+  // First-run banner explaining peak prediction.
+  const [peakBannerDismissed, setPeakBannerDismissed] = useLocalStorage(
+    "neuronbridge-vol-viewer-peak-banner-dismissed",
+    false
+  );
+  React.useEffect(() => {
+    if (peakBannerDismissed) {
+      return undefined;
+    }
+    const timeoutId = setTimeout(() => setPeakBannerDismissed(true), 20000);
+    return () => clearTimeout(timeoutId);
+  }, [peakBannerDismissed, setPeakBannerDismissed]);
+  const {
+    isPredicting,
+    predictedPeak,
+    transferFunctionTexPredicting,
+    useSurfacePredicting,
+    onRenderedImagePredicting,
+    predictFluoTransferPeak,
+  } = usePeakPredictor({
+    alpha0,
+    alpha1,
+    dataGamma: paramState.dataGamma,
+    colorStr: paramState.dataColor,
+  });
 
   const onResetCamera = () => {
     let updatedSearchParams = new URLSearchParams(searchParams.toString());
@@ -239,6 +299,9 @@ export default function VolumeDataLoader() {
   };
 
   React.useEffect(() => {
+    if (isPredicting) {
+      return;
+    }
     setTransferFuncTex(
       makeFluoTransferTex(
         alpha0,
@@ -248,7 +311,12 @@ export default function VolumeDataLoader() {
         paramState.dataColor
       )
     );
-  }, [paramState.peak, paramState.dataGamma, paramState.dataColor]);
+  }, [
+    paramState.peak,
+    paramState.dataGamma,
+    paramState.dataColor,
+    isPredicting,
+  ]);
 
   /* There is a security feature in safari that prevents an application from
    * using the history.pushState() function more than 100 times in 30
@@ -312,6 +380,10 @@ export default function VolumeDataLoader() {
 
       updateSearchParameters({ name: "dp", value });
     }
+  };
+
+  const onDoPeakPredictionChange = () => {
+    setDoPeakPrediction((v) => !v);
   };
 
   const onDataGammaChange = (value) => {
@@ -379,6 +451,51 @@ export default function VolumeDataLoader() {
     }
   }, 500);
 
+  // Start prediction of the peak value when both volume data and surface mesh are ready.
+  // Uses a ref to avoid re-triggering on unrelated state changes.
+  React.useEffect(() => {
+    if (
+      dataUint8 &&
+      swcSurfaceMesh &&
+      !predictionStartedRef.current &&
+      doPeakPrediction
+    ) {
+      predictionStartedRef.current = true;
+      // Delay prediction until the next repaint to prevent an all-black frame.
+      requestAnimationFrame(() => {
+        predictFluoTransferPeak();
+      });
+    }
+  }, [dataUint8, swcSurfaceMesh, predictFluoTransferPeak, doPeakPrediction]);
+
+  // When peak prediction completes, update the peak parameter and URL. This effect
+  // intentionally only depends on `predictedPeak`. For other parameters of the transfer
+  // function, use the current values at the end of prediction (to elminate the effect of
+  // user changes to those values during prediction, though unlikely).
+  React.useEffect(() => {
+    let initialPeak = doPeakPrediction ? predictedPeak : peakDefault;
+    if (initialPeak !== null) {
+      dispatch({ type: "update", value: initialPeak, parameter: "peak" });
+      updateSearchParameters({ name: "dp", value: initialPeak });
+      defaultState.peak = initialPeak;
+      setTransferFuncTex(
+        makeFluoTransferTex(
+          alpha0,
+          initialPeak,
+          paramState.dataGamma,
+          alpha1,
+          paramState.dataColor
+        )
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [predictedPeak, updateSearchParameters, doPeakPrediction]);
+
+  // Reset the prediction guard when the volume URL changes.
+  React.useEffect(() => {
+    predictionStartedRef.current = false;
+  }, [h5jUrl, channel]);
+
   const onWebGLRender = React.useCallback(() => {
     // Events generated by the spinners on the final-gamma control (and others) need to
     // be throttled, to avoid having a backlog of events that continue to be processed
@@ -440,7 +557,6 @@ export default function VolumeDataLoader() {
   // when computing the default camera position.
   const MAIN_COL_COUNT_DEFAULT = 16;
   const TOTAL_COL_COUNT = 24;
-  const CONTROLS_COL_COUNT = TOTAL_COL_COUNT - MAIN_COL_COUNT_DEFAULT;
 
   React.useEffect(() => {
     setH5jLoadingError(null);
@@ -524,6 +640,9 @@ export default function VolumeDataLoader() {
 
   React.useEffect(() => {
     async function loadData(dataUrl, isObj) {
+      if (!volumeSize || !voxelSize) {
+        return;
+      }
       const text = await textFromFileOrURL(dataUrl);
       let mesh = null;
       if (isObj) {
@@ -582,10 +701,16 @@ export default function VolumeDataLoader() {
             volumeSize={volumeSize}
             voxelSize={voxelSize}
             dtScale={paramState.dtScale}
-            transferFunctionTex={transferFunctionTex}
+            // prettier-ignore
+            transferFunctionTex={
+              isPredicting ? transferFunctionTexPredicting :
+              (!doPeakPrediction || predictedPeak !== null) ? transferFunctionTex :
+              invisibleTex
+            }
             finalGamma={paramState.finalGamma}
             useLighting={useLighting}
-            useSurface={useSurface}
+            // prettier-ignore
+            useSurface={isPredicting ? useSurfacePredicting : useSurface}
             surfaceMesh={swcSurfaceMesh}
             alphaScale={paramState.alphaScale}
             surfaceColor={paramState.surfaceColor}
@@ -598,7 +723,25 @@ export default function VolumeDataLoader() {
             cameraFovDegrees={paramState.cameraFovDegrees}
             interactionSpeedup={paramState.speedUp}
             heightCorrection={false}
+            onRenderedImage={onRenderedImagePredicting}
+            useCameraControls={!isPredicting}
           />
+          {!peakBannerDismissed && (
+            <div
+              className="peakPredictionBanner"
+              onClick={() => setPeakBannerDismissed(true)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setPeakBannerDismissed(true);
+                }
+              }}
+            >
+              A local model now predicts the initial saturation point for each
+              match. Use the gear icon to opt out.
+            </div>
+          )}
         </div>
         {showControls ? (
           <div className="sidebar">
@@ -608,6 +751,8 @@ export default function VolumeDataLoader() {
               finalGamma={paramState.finalGamma}
               peak={paramState.peak}
               onPeakChange={onPeakChange}
+              doPeakPrediction={doPeakPrediction}
+              onDoPeakPredictionChange={onDoPeakPredictionChange}
               onDataGammaChange={onDataGammaChange}
               dataGamma={paramState.dataGamma}
               dtScale={paramState.dtScale}
@@ -630,6 +775,7 @@ export default function VolumeDataLoader() {
               onReset={onReset}
               onResetCamera={onResetCamera}
               onResetParameters={onResetParameters}
+              isPredicting={isPredicting}
             />
           </div>
         ) : (

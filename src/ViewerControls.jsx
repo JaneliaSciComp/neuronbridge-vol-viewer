@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import useEventListener from "@use-it/event-listener";
 import {
   Tooltip,
+  Popover,
   Slider,
   Row,
   Col,
@@ -10,7 +11,7 @@ import {
   Menu,
   Typography,
 } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { QuestionCircleOutlined, SettingOutlined } from "@ant-design/icons";
 import { convertUrlToFileName } from "./utils";
 import { useSearchParams } from "react-router-dom";
 
@@ -32,6 +33,8 @@ export default function ViewerControls({
   finalGamma,
   peak,
   onPeakChange,
+  doPeakPrediction,
+  onDoPeakPredictionChange,
   onDataGammaChange,
   dataGamma,
   dtScale,
@@ -54,6 +57,7 @@ export default function ViewerControls({
   onReset,
   onResetCamera,
   onResetParameters,
+  isPredicting,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const swcUrl = searchParams.get("swc");
@@ -201,6 +205,7 @@ export default function ViewerControls({
             className="colorPicker"
             value={dataColor}
             onChange={onDataColorChange}
+            disabled={isPredicting}
           />
         </Col>
         <Col span={5} style={{ textAlign: "right" }}>
@@ -224,6 +229,30 @@ export default function ViewerControls({
           <label htmlFor="dataPeak">Saturation Point</label>{" "}
           <QuestionCircleOutlined />
         </Tooltip>
+        <Popover
+          placement="left"
+          color="#008b94"
+          trigger="click"
+          content={
+            <div className="peakPredictionPopover">
+              <div className="heading">
+                Predict an initial saturation point for each loaded match
+              </div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={doPeakPrediction}
+                  onChange={onDoPeakPredictionChange}
+                />
+                Enabled
+              </label>
+            </div>
+          }
+        >
+          <span className="settingsIcon">
+            <SettingOutlined />
+          </span>
+        </Popover>
       </Row>
       <Row className="viewerControls">
         <Col span={6}>
@@ -236,6 +265,7 @@ export default function ViewerControls({
             step="1"
             value={peak}
             onChange={onPeakInputChange}
+            disabled={isPredicting}
           />
         </Col>
         <Col span={18}>
@@ -248,6 +278,7 @@ export default function ViewerControls({
             railStyle={{
               background: `linear-gradient(.25turn, ${dataColor}, #000000)`,
             }}
+            disabled={isPredicting}
           />
         </Col>
       </Row>
@@ -273,6 +304,7 @@ export default function ViewerControls({
             max={dataGammaMax}
             step="0.01"
             onChange={onDataGammaInputChange}
+            disabled={isPredicting}
           />
         </Col>
         <Col span={18}>
@@ -285,6 +317,7 @@ export default function ViewerControls({
             railStyle={{
               background: `linear-gradient(.25turn, #000000, ${dataColor})`,
             }}
+            disabled={isPredicting}
           />
         </Col>
       </Row>
@@ -324,6 +357,7 @@ export default function ViewerControls({
             max={finalGammaMax}
             step="0.1"
             onChange={onFinalGammaInputChange}
+            disabled={isPredicting}
           />
         </Col>
         <Col span={18}>
@@ -336,6 +370,7 @@ export default function ViewerControls({
             railStyle={{
               background: `linear-gradient(.25turn, #000000, ${dataColor})`,
             }}
+            disabled={isPredicting}
           />
         </Col>
       </Row>
@@ -362,6 +397,7 @@ export default function ViewerControls({
             onChange={(event) =>
               onAlphaChange(parseFloat(event.target.value, 10))
             }
+            disabled={isPredicting}
           />
         </Col>
         <Col span={18}>
@@ -374,6 +410,7 @@ export default function ViewerControls({
             railStyle={{
               background: `linear-gradient(.25turn, #000000, #ffffff)`,
             }}
+            disabled={isPredicting}
           />
         </Col>
       </Row>
@@ -400,6 +437,7 @@ export default function ViewerControls({
             onChange={(event) =>
               onSpeedUpChange(parseInt(event.target.value, 10))
             }
+            disabled={isPredicting}
           />
         </Col>
       </Row>
@@ -437,6 +475,8 @@ ViewerControls.propTypes = {
   finalGamma: PropTypes.number.isRequired,
   onPeakChange: PropTypes.func.isRequired,
   peak: PropTypes.number.isRequired,
+  onDoPeakPredictionChange: PropTypes.func.isRequired,
+  doPeakPrediction: PropTypes.bool.isRequired,
   onDataGammaChange: PropTypes.func.isRequired,
   dataGamma: PropTypes.number.isRequired,
   dtScale: PropTypes.number.isRequired,
@@ -459,4 +499,5 @@ ViewerControls.propTypes = {
   onReset: PropTypes.func.isRequired,
   onResetParameters: PropTypes.func.isRequired,
   onResetCamera: PropTypes.func.isRequired,
+  isPredicting: PropTypes.bool.isRequired,
 };
