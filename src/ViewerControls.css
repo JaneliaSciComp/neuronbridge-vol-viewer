@@ -112,3 +112,29 @@ kbd {
   bottom: 1em;
   right: 1em;
 }
+
+.peakPredictionPopover {
+  color: #ccc;
+}
+
+.peakPredictionPopover label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.peakPredictionPopover .heading {
+  margin-bottom: 8px;
+}
+
+.peakPredictionPopover input[type="checkbox"] {
+  accent-color: #008b94;
+}
+
+.settingsIcon {
+  display: inline-flex;
+  cursor: pointer;
+  margin-left: 0.25em;
+}

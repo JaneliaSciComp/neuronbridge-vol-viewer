@@ -50,6 +50,25 @@
   grid-area: main;
   overflow: hidden;
   background: #000;
+  position: relative;
+}
+
+.peakPredictionBanner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.peakPredictionBanner:hover {
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .viewerFull {
@@ -58,4 +77,5 @@
   grid-column-start: 1;
   grid-column-end: -1;
   display: grid;
+  position: relative;
 }
