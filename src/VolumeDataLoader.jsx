@@ -488,13 +488,8 @@ export default function VolumeDataLoader() {
         )
       );
     }
-  }, [
-    paramState.dataColor,
-    paramState.dataGamma,
-    predictedPeak,
-    updateSearchParameters,
-    doPeakPrediction,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [predictedPeak, updateSearchParameters, doPeakPrediction]);
 
   // Reset the prediction guard when the volume URL changes.
   React.useEffect(() => {
